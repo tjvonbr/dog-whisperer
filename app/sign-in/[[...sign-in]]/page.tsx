@@ -1,19 +1,18 @@
-import { auth } from '@/auth'
-import LoginForm from '@/components/login-form'
 import { IconLogo } from '@/components/ui/icons'
-import { Session } from '@/lib/types'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { SignIn } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 
 export default async function LoginPage() {
-  const session = (await auth()) as Session
+  const { userId } = auth()
 
-  if (session) {
+  if (userId) {
     redirect('/')
   }
 
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+    <div className="container flex size-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="flex flex-col space-y-2 text-center">
           <IconLogo className="mx-auto size-6" />
@@ -24,7 +23,7 @@ export default async function LoginPage() {
             Enter your email and password to sign in to your account
           </p>
         </div>
-        <LoginForm />
+        <SignIn path="/sign-in" />
         <p className="px-8 text-center text-sm text-muted-foreground">
           <Link
             href="/signup"

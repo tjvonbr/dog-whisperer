@@ -1,8 +1,7 @@
-import { auth } from '@/auth'
-import SignupForm from '@/components/signup-form'
+import { SignUp } from '@clerk/nextjs'
 import { IconLogo } from '@/components/ui/icons'
-import { Session } from '@/lib/types'
 import { redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 
 export const metadata = {
   title: 'Create an account',
@@ -10,14 +9,14 @@ export const metadata = {
 }
 
 export default async function SignupPage() {
-  const session = (await auth()) as Session
+  const { userId } = auth()
 
-  if (session) {
+  if (userId) {
     redirect('/')
   }
 
   return (
-    <div className="container grid h-screen w-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="container grid size-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="hidden h-full bg-muted lg:block" />
       <div className="lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
@@ -30,7 +29,7 @@ export default async function SignupPage() {
               Enter your email and password below to create your account
             </p>
           </div>
-          <SignupForm />
+          <SignUp path="/sign-up" />
         </div>
       </div>
     </div>
