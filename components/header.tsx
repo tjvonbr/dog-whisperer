@@ -1,14 +1,11 @@
 import * as React from 'react'
 import Link from 'next/link'
-
 import { auth } from '@clerk/nextjs/server'
 import { Button } from '@/components/ui/button'
 import { IconLogo, IconNextChat } from '@/components/ui/icons'
-import { UserMenu } from '@/components/user-menu'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
-import { Session } from '@/lib/types'
 import { UserButton } from '@clerk/nextjs'
 
 async function UserOrLogin() {
