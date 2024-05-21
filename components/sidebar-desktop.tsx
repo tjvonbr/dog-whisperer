@@ -1,3 +1,4 @@
+import { auth } from '@clerk/nextjs/server'
 import { Sidebar } from '@/components/sidebar'
 import { ChatHistory } from '@/components/chat-history'
 import { auth } from '@clerk/nextjs/server'

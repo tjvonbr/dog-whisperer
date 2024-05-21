@@ -40,7 +40,7 @@ export async function getChat(id: string, userId: string) {
 }
 
 export async function removeChat({ id, path }: { id: string; path: string }) {
-  const { userId } = await auth()
+  const { userId } = auth()
 
   if (!userId) {
     return {
@@ -65,7 +65,7 @@ export async function removeChat({ id, path }: { id: string; path: string }) {
 }
 
 export async function clearChats() {
-  const { userId } = await auth()
+  const { userId } = auth()
 
   if (!userId) {
     return {
@@ -101,7 +101,7 @@ export async function getSharedChat(id: string) {
 }
 
 export async function shareChat(id: string) {
-  const { userId } = await auth()
+  const { userId } = auth()
 
   if (!userId) {
     return {
@@ -128,7 +128,7 @@ export async function shareChat(id: string) {
 }
 
 export async function saveChat(chat: Chat) {
-  const { userId } = await auth()
+  const { userId } = auth()
 
   if (userId) {
     const pipeline = kv.pipeline()
