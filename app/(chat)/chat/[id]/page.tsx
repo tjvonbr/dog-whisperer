@@ -4,8 +4,6 @@ import { auth } from '@clerk/nextjs/server'
 import { getChat, getMissingKeys } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
-import { Session } from '@/lib/types'
-import { auth } from '@clerk/nextjs/server'
 
 export interface ChatPageProps {
   params: {
