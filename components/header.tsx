@@ -26,15 +26,7 @@ async function UserOrLogin() {
           <IconNextChat className="hidden size-6 mr-2 dark:block" />
         </Link>
       )}
-      <div className="flex items-center">
-        {userId ? (
-          <UserButton />
-        ) : (
-          <Button variant="link" asChild className="-ml-2">
-            <Link href="/sign-in">Login</Link>
-          </Button>
-        )}
-      </div>
+      <div className="flex items-center">{userId && <UserButton />}</div>
     </div>
   )
 }
