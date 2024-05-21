@@ -205,7 +205,7 @@ export const AI = createAI<AIState, UIState>({
 
     const { userId } = auth()
 
-    if (userId && userId) {
+    if (userId) {
       const aiState = getAIState()
 
       if (aiState) {

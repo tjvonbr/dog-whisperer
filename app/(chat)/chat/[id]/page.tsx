@@ -1,10 +1,9 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 import { getChat, getMissingKeys } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
-import { Session } from '@/lib/types'
-import { auth } from '@clerk/nextjs/server'
 
 export interface ChatPageProps {
   params: {
@@ -15,7 +14,7 @@ export interface ChatPageProps {
 export async function generateMetadata({
   params
 }: ChatPageProps): Promise<Metadata> {
-  const { userId } = auth()
+  const { userId } = await auth()
 
   if (!userId) {
     return {}
@@ -29,6 +28,7 @@ export async function generateMetadata({
 
 export default async function ChatPage({ params }: ChatPageProps) {
   const { userId } = auth()
+
   const missingKeys = await getMissingKeys()
 
   if (!userId) {
