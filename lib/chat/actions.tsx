@@ -190,6 +190,7 @@ export type AIState = {
 
 export type UIState = {
   id: string
+  role: 'user' | 'assistant' | 'system' | 'function' | 'data' | 'tool'
   display: React.ReactNode
 }[]
 
@@ -249,6 +250,7 @@ export const getUIStateFromAIState = (aiState: Chat) => {
     .filter(message => message.role !== 'system')
     .map((message, index) => ({
       id: `${aiState.chatId}-${index}`,
+      role: message.role,
       display:
         message.role === 'function' ? (
           message.name === 'listStocks' ? (
