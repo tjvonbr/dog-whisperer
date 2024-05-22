@@ -11,6 +11,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Message } from '@/lib/chat/actions'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
+import { initialState } from '@clerk/nextjs/dist/types/app-router/server/auth'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
