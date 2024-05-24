@@ -1,8 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/server/stripe'
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = auth()
 
