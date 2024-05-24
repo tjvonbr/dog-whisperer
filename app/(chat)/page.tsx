@@ -10,14 +10,9 @@ export default async function IndexPage() {
   const id = nanoid()
   const { userId } = auth()
 
-  if (!userId) {
-    redirect('/sign-in')
-  }
-
-  const user = await getUserById(userId)
-
-  if (!user) {
-    redirect('/sign-up')
+  let user = null
+  if (userId) {
+    user = await getUserById(userId)
   }
 
   const missingKeys = await getMissingKeys()
