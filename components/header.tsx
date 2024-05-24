@@ -1,12 +1,11 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
-import { Button } from '@/components/ui/button'
 import { IconLogo, IconNextChat } from '@/components/ui/icons'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
-import { UserButton } from '@clerk/nextjs'
+import UserMenu from './user-menu'
 
 async function UserOrLogin() {
   const { userId } = auth()
@@ -26,7 +25,7 @@ async function UserOrLogin() {
           <IconNextChat className="hidden size-6 mr-2 dark:block" />
         </Link>
       )}
-      <div className="flex items-center">{userId && <UserButton />}</div>
+      <div className="flex items-center">{userId && <UserMenu />}</div>
     </div>
   )
 }
