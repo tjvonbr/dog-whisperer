@@ -12,16 +12,28 @@ import {
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
 import { useRouter } from 'next/navigation'
-import { IconSignOut } from './ui/icons'
+import { toast } from 'sonner'
 
 export default function UserMenu() {
   const router = useRouter()
   const { isLoaded, user } = useUser()
   const { signOut, openUserProfile } = useClerk()
 
-  if (!isLoaded) return null
-  // Make sure there is valid user data
-  if (!user?.id) return null
+  if (!isLoaded || !user?.id) {
+    return null
+  }
+
+  async function createBillingSession() {
+    const response = await fetch('/api/stripe/billing-session', {
+      method: 'POST'
+    })
+
+    if (!response.ok) return toast.error('Whoops')
+
+    const data = await response.json()
+
+    router.replace(data.sessionUrl)
+  }
 
   return (
     <DropdownMenu>
@@ -53,7 +65,9 @@ export default function UserMenu() {
           >
             Profile
           </DropdownMenuItem>
-          <DropdownMenuItem>Billing</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => createBillingSession()}>
+            Billing
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
