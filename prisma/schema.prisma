@@ -19,6 +19,7 @@ model User {
   lastName        String
   email           String      @unique
   chats           Chat[]
+  stripeId        String?
 
   @@map("users")
 }

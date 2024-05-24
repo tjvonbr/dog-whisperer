@@ -11,16 +11,16 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Message } from '@/lib/chat/actions'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
-import { initialState } from '@clerk/nextjs/dist/types/app-router/server/auth'
+import { User } from '@prisma/client'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
   id?: string
-  userId?: string
+  user: User
   missingKeys: string[]
 }
 
-export function Chat({ id, className, userId, missingKeys }: ChatProps) {
+export function Chat({ id, className, user, missingKeys }: ChatProps) {
   const router = useRouter()
   const path = usePathname()
   const [input, setInput] = useState('')
@@ -30,12 +30,12 @@ export function Chat({ id, className, userId, missingKeys }: ChatProps) {
   const [_, setNewChatId] = useLocalStorage('newChatId', id)
 
   useEffect(() => {
-    if (userId) {
+    if (user) {
       if (!path.includes('chat') && messages.length === 1) {
         window.history.replaceState({}, '', `/chat/${id}`)
       }
     }
-  }, [id, path, userId, messages])
+  }, [id, path, user, messages])
 
   useEffect(() => {
     const messagesLength = aiState.messages?.length
@@ -67,7 +67,7 @@ export function Chat({ id, className, userId, missingKeys }: ChatProps) {
         ref={messagesRef}
       >
         {messages.length ? (
-          <ChatList messages={messages} isShared={false} userId={userId} />
+          <ChatList messages={messages} isShared={false} userId={user?.id} />
         ) : (
           <EmptyScreen />
         )}
@@ -79,6 +79,7 @@ export function Chat({ id, className, userId, missingKeys }: ChatProps) {
         setInput={setInput}
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
+        user={user}
       />
     </div>
   )
