@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/server/stripe'
 
 export async function POST(req: NextRequest) {
+  const origin = req.nextUrl.origin
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -12,9 +14,8 @@ export async function POST(req: NextRequest) {
           quantity: 1
         }
       ],
-      success_url:
-        'http://localhost:3000/order/success?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'http://localhost:3000/canceled.html'
+      success_url: `${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/canceled.html`
     })
 
     if (!session) {

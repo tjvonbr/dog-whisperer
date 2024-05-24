@@ -58,7 +58,7 @@ export function PromptForm({
           })
 
           if (!response.ok) {
-            toast.error('Whoops')
+            toast.error('We couldn&apos;t connect to Stripe at this time.')
           }
 
           const data = await response.json()
