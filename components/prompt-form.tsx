@@ -18,6 +18,8 @@ import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
 import { User } from '@prisma/client'
+import { toast } from 'sonner'
+import { loadStripe } from '@stripe/stripe-js'
 
 export function PromptForm({
   input,
@@ -26,7 +28,7 @@ export function PromptForm({
 }: {
   input: string
   setInput: (value: string) => void
-  user: User
+  user?: User | null
 }) {
   const router = useRouter()
   const { formRef, onKeyDown } = useEnterSubmit()
@@ -46,9 +48,24 @@ export function PromptForm({
       onSubmit={async (e: any) => {
         e.preventDefault()
 
-        if (!user.stripeId) {
-          console.log('hello')
-          return
+        const stripe = await loadStripe(
+          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
+        )
+
+        if (!user || !user.stripeId) {
+          const response = await fetch('/api/checkout-session', {
+            method: 'POST'
+          })
+
+          if (!response.ok) {
+            toast.error('Whoops')
+          }
+
+          const data = await response.json()
+
+          stripe?.redirectToCheckout({
+            sessionId: data.sessionId
+          })
         }
 
         // Blur focus on mobile
