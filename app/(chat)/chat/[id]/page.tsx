@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { getChat, getMissingKeys } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
+import { getUserById } from '@/lib/helpers/users'
 
 export interface ChatPageProps {
   params: {
@@ -32,7 +33,13 @@ export default async function ChatPage({ params }: ChatPageProps) {
   const missingKeys = await getMissingKeys()
 
   if (!userId) {
-    redirect(`/login?next=/chat/${params.id}`)
+    redirect(`/sign-in?next=/chat/${params.id}`)
+  }
+
+  const user = await getUserById(userId)
+
+  if (!user) {
+    redirect('/sign-up')
   }
 
   const chat = await getChat(params.id, userId)
@@ -49,7 +56,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
     <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
       <Chat
         id={chat.id}
-        userId={userId}
+        user={user}
         initialMessages={chat.messages}
         missingKeys={missingKeys}
       />
