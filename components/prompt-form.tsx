@@ -17,13 +17,16 @@ import {
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import { User } from '@prisma/client'
 
 export function PromptForm({
   input,
-  setInput
+  setInput,
+  user
 }: {
   input: string
   setInput: (value: string) => void
+  user: User
 }) {
   const router = useRouter()
   const { formRef, onKeyDown } = useEnterSubmit()
@@ -42,6 +45,11 @@ export function PromptForm({
       ref={formRef}
       onSubmit={async (e: any) => {
         e.preventDefault()
+
+        if (!user.stripeId) {
+          console.log('hello')
+          return
+        }
 
         // Blur focus on mobile
         if (window.innerWidth < 600) {
