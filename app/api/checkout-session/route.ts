@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
         }
       ],
       success_url: `${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/canceled.html`
+      cancel_url: origin
     })
 
     if (!session) {
