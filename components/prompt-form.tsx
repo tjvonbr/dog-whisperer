@@ -61,9 +61,11 @@ export function PromptForm({
             toast.error('We couldn&apos;t connect to Stripe at this time.')
           }
 
+          console.log(response)
+
           const data = await response.json()
 
-          stripe?.redirectToCheckout({
+          return stripe?.redirectToCheckout({
             sessionId: data.sessionId
           })
         }
