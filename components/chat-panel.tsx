@@ -14,6 +14,9 @@ import type { AI } from '@/lib/chat/actions'
 import { nanoid } from 'nanoid'
 import { UserMessage } from './stocks/message'
 import { User } from '@prisma/client'
+import { toast } from 'sonner'
+import stripe from '@/lib/hooks/use-stripe'
+import getStripe from '@/lib/hooks/use-stripe'
 
 export interface ChatPanelProps {
   id?: string
@@ -79,6 +82,24 @@ export function ChatPanel({
                   index > 1 && 'hidden md:block'
                 }`}
                 onClick={async () => {
+                  if (!user?.stripeId) {
+                    const response = await fetch('/api/checkout-session', {
+                      method: 'POST'
+                    })
+
+                    if (!response.ok) {
+                      toast.error("We couldn't connect to Stripe at this time.")
+                    }
+
+                    const data = await response.json()
+
+                    const stripe = await getStripe()
+
+                    return stripe?.redirectToCheckout({
+                      sessionId: data.sessionId
+                    })
+                  }
+
                   setMessages(currentMessages => [
                     ...currentMessages,
                     {
