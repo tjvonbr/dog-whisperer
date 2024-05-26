@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { User } from '@prisma/client'
 import { toast } from 'sonner'
 import { loadStripe } from '@stripe/stripe-js'
@@ -35,12 +35,24 @@ export function PromptForm({
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
   const [_, setMessages] = useUIState<typeof AI>()
+  const searchParams = useSearchParams()
 
   React.useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
   }, [])
+
+  React.useEffect(() => {
+    const success = searchParams.get('success')
+    if (success === 'true') {
+      toast('Order placed!  Welcome to Dog Whisperer AI!')
+    }
+
+    if (success === 'false') {
+      toast.error('Order canceled.')
+    }
+  })
 
   return (
     <form
@@ -52,16 +64,14 @@ export function PromptForm({
           process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
         )
 
-        if (!user || !user.stripeId) {
+        if (!user?.stripeId) {
           const response = await fetch('/api/checkout-session', {
             method: 'POST'
           })
 
           if (!response.ok) {
-            toast.error('We couldn&apos;t connect to Stripe at this time.')
+            toast.error("We couldn't connect to Stripe at this time.")
           }
-
-          console.log(response)
 
           const data = await response.json()
 
