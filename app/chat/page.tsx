@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 import { getMissingKeys } from '@/app/actions'
 import { getUserById } from '@/lib/helpers/users'
 
-export default async function IndexPage() {
+export default async function ChatPage() {
   const id = nanoid()
   const { userId } = auth()
 
