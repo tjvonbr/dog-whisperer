@@ -12,7 +12,7 @@ export default async function SignupPage() {
   const { userId } = auth()
 
   if (userId) {
-    redirect('/')
+    redirect('/chat')
   }
 
   return (
