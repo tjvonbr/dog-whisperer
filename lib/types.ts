@@ -31,7 +31,8 @@ export interface AuthResult {
 
 export interface User extends Record<string, any> {
   id: string
+  firstName: string
+  lastName: string
   email: string
-  password: string
-  salt: string
+  stripeId: string
 }

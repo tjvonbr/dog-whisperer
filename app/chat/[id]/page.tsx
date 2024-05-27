@@ -1,10 +1,9 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { getChat, getMissingKeys } from '@/app/actions'
+import { getChat, getMissingKeys, getUser } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
-import { getUserById } from '@/lib/helpers/users'
 
 export interface ChatPageProps {
   params: {
@@ -36,7 +35,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
     redirect(`/sign-in?next=/chat/${params.id}`)
   }
 
-  const user = await getUserById(userId)
+  const user = await getUser(userId)
 
   if (!user) {
     redirect('/sign-up')

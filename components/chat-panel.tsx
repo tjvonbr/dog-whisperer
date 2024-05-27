@@ -13,10 +13,9 @@ import { useAIState, useActions, useUIState } from 'ai/rsc'
 import type { AI } from '@/lib/chat/actions'
 import { nanoid } from 'nanoid'
 import { UserMessage } from './stocks/message'
-import { User } from '@prisma/client'
 import { toast } from 'sonner'
-import stripe from '@/lib/hooks/use-stripe'
 import getStripe from '@/lib/hooks/use-stripe'
+import { User } from '@/lib/types'
 
 export interface ChatPanelProps {
   id?: string

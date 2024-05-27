@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { kv } from '@vercel/kv'
 import { auth } from '@clerk/nextjs/server'
-import { type Chat } from '@/lib/types'
+import { User, type Chat } from '@/lib/types'
 
 export async function getChats(userId?: string | null) {
   if (!userId) {
@@ -141,6 +141,22 @@ export async function saveChat(chat: Chat) {
   } else {
     return
   }
+}
+
+export async function saveUser(user: User) {
+  const pipeline = kv.pipeline()
+  pipeline.hset(`user:${user.id}`, user)
+  await pipeline.exec()
+}
+
+export async function getUser(id: string) {
+  const user = await kv.hgetall<User>(`user:${id}`)
+
+  if (!user) {
+    return null
+  }
+
+  return user
 }
 
 export async function refreshHistory(path: string) {

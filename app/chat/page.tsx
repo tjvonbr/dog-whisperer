@@ -2,8 +2,7 @@ import { nanoid } from '@/lib/utils'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
 import { auth } from '@clerk/nextjs/server'
-import { getMissingKeys } from '@/app/actions'
-import { getUserById } from '@/lib/helpers/users'
+import { getMissingKeys, getUser } from '@/app/actions'
 
 export default async function ChatPage() {
   const id = nanoid()
@@ -11,7 +10,7 @@ export default async function ChatPage() {
 
   let user = null
   if (userId) {
-    user = await getUserById(userId)
+    user = await getUser(userId)
   }
 
   const missingKeys = await getMissingKeys()
