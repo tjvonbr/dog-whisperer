@@ -9,16 +9,7 @@ import {
   createStreamableValue
 } from 'ai/rsc'
 import { anthropic } from '@ai-sdk/anthropic'
-import {
-  spinner,
-  BotCard,
-  BotMessage,
-  SystemMessage,
-  Stock,
-  Purchase
-} from '@/components/stocks'
-import { Events } from '@/components/stocks/events'
-import { Stocks } from '@/components/stocks/stocks'
+import { spinner, BotMessage, SystemMessage } from '@/components/stocks'
 import {
   formatNumber,
   runAsyncFnWithoutBlocking,
@@ -27,8 +18,8 @@ import {
 } from '@/lib/utils'
 import { saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
+import { Chat } from '../types'
 
 async function confirmPurchase(symbol: string, price: number, amount: number) {
   'use server'
@@ -217,7 +208,7 @@ export const AI = createAI<AIState, UIState>({
       return
     }
   },
-  onSetAIState: async ({ state, done }) => {
+  onSetAIState: async ({ state }) => {
     'use server'
 
     const { userId } = auth()
@@ -227,7 +218,7 @@ export const AI = createAI<AIState, UIState>({
 
       const createdAt = new Date()
       const path = `/chat/${chatId}`
-      const title = messages[0].content.substring(0, 100)
+      const title = messages[0].content.substring(0, 100) || 'Untitled'
 
       const chat: Chat = {
         id: chatId,
@@ -249,28 +240,10 @@ export const getUIStateFromAIState = (aiState: Chat) => {
   return aiState.messages
     .filter(message => message.role !== 'system')
     .map((message, index) => ({
-      id: `${aiState.chatId}-${index}`,
+      id: `${message.id}-${index}`,
       role: message.role,
       display:
-        message.role === 'function' ? (
-          message.name === 'listStocks' ? (
-            <BotCard>
-              <Stocks props={JSON.parse(message.content)} />
-            </BotCard>
-          ) : message.name === 'showStockPrice' ? (
-            <BotCard>
-              <Stock props={JSON.parse(message.content)} />
-            </BotCard>
-          ) : message.name === 'showStockPurchase' ? (
-            <BotCard>
-              <Purchase props={JSON.parse(message.content)} />
-            </BotCard>
-          ) : message.name === 'getEvents' ? (
-            <BotCard>
-              <Events props={JSON.parse(message.content)} />
-            </BotCard>
-          ) : null
-        ) : message.role === 'user' ? (
+        message.role === 'user' ? (
           <UserMessage>{message.content}</UserMessage>
         ) : (
           <BotMessage content={message.content} />
