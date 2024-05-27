@@ -17,9 +17,9 @@ import {
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { User } from '@prisma/client'
 import { toast } from 'sonner'
 import { loadStripe } from '@stripe/stripe-js'
+import { User } from '@/lib/types'
 
 export function PromptForm({
   input,

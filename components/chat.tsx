@@ -10,7 +10,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Message } from '@/lib/chat/actions'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
-import { User } from '@prisma/client'
+import { User } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
