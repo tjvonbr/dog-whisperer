@@ -34,5 +34,6 @@ export interface User extends Record<string, any> {
   firstName: string
   lastName: string
   email: string
+  freeCredits: number
   stripeId: string
 }
