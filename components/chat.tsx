@@ -30,7 +30,7 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
 
   useEffect(() => {
     if (user) {
-      if (!path.includes('chat') && messages.length === 1) {
+      if (path.includes('chat') && messages.length === 1) {
         window.history.replaceState({}, '', `/chat/${id}`)
       }
     }
