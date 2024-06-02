@@ -8,9 +8,7 @@ import {
   createStreamableValue
 } from 'ai/rsc'
 import { anthropic } from '@ai-sdk/anthropic'
-import { BotMessage, Stock, Purchase } from '@/components/stocks'
-import { Events } from '@/components/stocks/events'
-import { Stocks } from '@/components/stocks/stocks'
+import { BotMessage } from '@/components/stocks'
 import { nanoid } from '@/lib/utils'
 import { saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
@@ -122,7 +120,7 @@ export const AI = createAI<AIState, UIState>({
       return
     }
   },
-  onSetAIState: async ({ state, done }) => {
+  onSetAIState: async ({ state }) => {
     'use server'
 
     const { userId } = auth()
@@ -130,7 +128,6 @@ export const AI = createAI<AIState, UIState>({
     if (userId) {
       const { chatId, messages } = state
 
-      const createdAt = new Date()
       const path = `/chat/${chatId}`
       const title = messages[0].content.substring(0, 100)
 
@@ -138,7 +135,6 @@ export const AI = createAI<AIState, UIState>({
         id: chatId,
         title,
         userId,
-        createdAt,
         messages,
         path
       }
