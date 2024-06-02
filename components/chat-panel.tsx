@@ -24,7 +24,7 @@ export interface ChatPanelProps {
   setInput: (value: string) => void
   isAtBottom: boolean
   scrollToBottom: () => void
-  user?: User | null
+  user: User
 }
 
 export function ChatPanel({
