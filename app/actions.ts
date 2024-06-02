@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { kv } from '@vercel/kv'
 import { auth } from '@clerk/nextjs/server'
 import { User, type Chat } from '@/lib/types'
 import supabase from '@/server/supabase'
@@ -25,13 +24,18 @@ export async function getChats(userId?: string | null) {
 }
 
 export async function getChat(id: string, userId: string) {
-  const { data: chat } = await supabase.from('chats').select().eq('id', id)
+  const { data: chat } = await supabase
+    .from('chats')
+    .select()
+    .eq('id', id)
+    .limit(1)
+    .single()
 
-  if (!chat || (userId && chat[0].userId !== userId)) {
+  if (!chat || (userId && chat.userId !== userId)) {
     return null
   }
 
-  return chat[0] as Chat
+  return chat as Chat
 }
 
 export async function removeChat({ id, path }: { id: string; path: string }) {
@@ -73,9 +77,14 @@ export async function clearChats() {
 }
 
 export async function getSharedChat(id: string) {
-  const { data: chat } = await supabase.from('chats').select().eq('id', id)
+  const { data: chat } = await supabase
+    .from('chats')
+    .select()
+    .eq('id', id)
+    .limit(1)
+    .single()
 
-  if (!chat || !chat[0].sharePath) {
+  if (!chat || !chat.sharePath) {
     return null
   }
 
@@ -146,13 +155,18 @@ export async function saveUser(user: User) {
 }
 
 export async function getUser(id: string) {
-  const { data: user } = await supabase.from('users').select().eq('id', id)
+  const { data: user } = await supabase
+    .from('users')
+    .select()
+    .eq('id', id)
+    .limit(1)
+    .single()
 
   if (!user) {
     return null
   }
 
-  return user[0]
+  return user
 }
 
 export async function refreshHistory(path: string) {
