@@ -74,7 +74,6 @@ export function PromptForm({
           }
 
           const data = await response.json()
-          console.log(data)
 
           return stripe?.redirectToCheckout({
             sessionId: data.sessionId
