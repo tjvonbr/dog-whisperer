@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { kv } from '@vercel/kv'
 import { auth } from '@clerk/nextjs/server'
 import { User, type Chat } from '@/lib/types'
+import supabase from '@/server/supabase'
 
 export async function getChats(userId?: string | null) {
   if (!userId) {
@@ -12,31 +12,30 @@ export async function getChats(userId?: string | null) {
   }
 
   try {
-    const pipeline = kv.pipeline()
-    const chats: string[] = await kv.zrange(`user:chat:${userId}`, 0, -1, {
-      rev: true
-    })
+    const { data: chats } = await supabase
+      .from('chats')
+      .select()
+      .eq('userId', userId)
 
-    for (const chat of chats) {
-      pipeline.hgetall(chat)
-    }
-
-    const results = await pipeline.exec()
-
-    return results as Chat[]
+    return chats as Chat[]
   } catch (error) {
     return []
   }
 }
 
 export async function getChat(id: string, userId: string) {
-  const chat = await kv.hgetall<Chat>(`chat:${id}`)
+  const { data: chat } = await supabase
+    .from('chats')
+    .select()
+    .eq('id', id)
+    .limit(1)
+    .single()
 
   if (!chat || (userId && chat.userId !== userId)) {
     return null
   }
 
-  return chat
+  return chat as Chat
 }
 
 export async function removeChat({ id, path }: { id: string; path: string }) {
@@ -48,19 +47,9 @@ export async function removeChat({ id, path }: { id: string; path: string }) {
     }
   }
 
-  //Convert uid to string for consistent comparison with session.user.id
-  const uid = String(await kv.hget(`chat:${id}`, 'userId'))
+  await supabase.from('chat').delete().eq('id', id)
 
-  if (uid !== userId) {
-    return {
-      error: 'Unauthorized'
-    }
-  }
-
-  await kv.del(`chat:${id}`)
-  await kv.zrem(`user:chat:${userId}`, `chat:${id}`)
-
-  revalidatePath('/')
+  revalidatePath('/chat')
   return revalidatePath(path)
 }
 
@@ -73,25 +62,27 @@ export async function clearChats() {
     }
   }
 
-  const chats: string[] = await kv.zrange(`user:chat:${userId}`, 0, -1)
+  const chats = await getChats(userId)
+
   if (!chats.length) {
-    return redirect('/')
-  }
-  const pipeline = kv.pipeline()
-
-  for (const chat of chats) {
-    pipeline.del(chat)
-    pipeline.zrem(`user:chat:${userId}`, chat)
+    return redirect('/chat')
   }
 
-  await pipeline.exec()
+  const chatIds = chats.map(chat => chat.id)
 
-  revalidatePath('/')
-  return redirect('/')
+  await supabase.from('chats').delete().in('id', chatIds)
+
+  revalidatePath('/chat')
+  return redirect('/chat')
 }
 
 export async function getSharedChat(id: string) {
-  const chat = await kv.hgetall<Chat>(`chat:${id}`)
+  const { data: chat } = await supabase
+    .from('chats')
+    .select()
+    .eq('id', id)
+    .limit(1)
+    .single()
 
   if (!chat || !chat.sharePath) {
     return null
@@ -109,7 +100,7 @@ export async function shareChat(id: string) {
     }
   }
 
-  const chat = await kv.hgetall<Chat>(`chat:${id}`)
+  const chat = await getChat(id, userId)
 
   if (!chat || chat.userId !== userId) {
     return {
@@ -122,7 +113,9 @@ export async function shareChat(id: string) {
     sharePath: `/share/${chat.id}`
   }
 
-  await kv.hmset(`chat:${chat.id}`, payload)
+  await supabase.from('chats').update({
+    sharePath: payload.sharePath
+  })
 
   return payload
 }
@@ -130,27 +123,44 @@ export async function shareChat(id: string) {
 export async function saveChat(chat: Chat) {
   const { userId } = auth()
 
-  if (userId) {
-    const pipeline = kv.pipeline()
-    pipeline.hmset(`chat:${chat.id}`, chat)
-    pipeline.zadd(`user:chat:${chat.userId}`, {
-      score: Date.now(),
-      member: `chat:${chat.id}`
-    })
-    await pipeline.exec()
-  } else {
-    return
+  if (!userId) {
+    return {
+      error: 'You are not authorized to perform this action.'
+    }
   }
+
+  const result = await supabase
+    .from('chats')
+    .upsert({
+      id: chat.id,
+      title: chat.title,
+      path: chat.path,
+      messages: chat.messages,
+      userId,
+      updatedAt: new Date()
+    })
+    .select('id')
+
+  return result
 }
 
 export async function saveUser(user: User) {
-  const pipeline = kv.pipeline()
-  pipeline.hset(`user:${user.id}`, user)
-  await pipeline.exec()
+  await supabase.from('users').insert({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    stripeId: user.stripeId
+  })
 }
 
 export async function getUser(id: string) {
-  const user = await kv.hgetall<User>(`user:${id}`)
+  const { data: user } = await supabase
+    .from('users')
+    .select()
+    .eq('id', id)
+    .limit(1)
+    .single()
 
   if (!user) {
     return null

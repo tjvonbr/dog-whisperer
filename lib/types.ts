@@ -3,7 +3,7 @@ import { Message } from 'ai'
 export interface Chat extends Record<string, any> {
   id: string
   title: string
-  createdAt: Date
+  createdAt?: Date
   userId: string
   path: string
   messages: Message[]
@@ -34,6 +34,6 @@ export interface User extends Record<string, any> {
   firstName: string
   lastName: string
   email: string
-  freeCredits: number
+  credits: number
   stripeId: string
 }
