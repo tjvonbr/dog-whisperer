@@ -19,7 +19,7 @@ export default async function SignupPage() {
     <div className="container grid size-full flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="hidden h-full bg-muted lg:block" />
       <div className="h-[calc(100vh-64px)] flex flex-col justify-center items-center lg:p-8">
-        <SignUp path="/sign-up" />
+        <SignUp path="/sign-up" forceRedirectUrl="/chat" />
       </div>
     </div>
   )
