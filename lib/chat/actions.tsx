@@ -10,13 +10,29 @@ import {
 import { anthropic } from '@ai-sdk/anthropic'
 import { BotMessage } from '@/components/stocks'
 import { nanoid } from '@/lib/utils'
-import { saveChat } from '@/app/actions'
+import { getUser, saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
 
 async function submitUserMessage(content: string) {
   'use server'
+
+  const { userId } = auth()
+
+  if (!userId) {
+    return {
+      error: 'User is not authenticated.'
+    }
+  }
+
+  const user = await getUser(userId)
+
+  if (!user) {
+    return {
+      error: 'User not found.'
+    }
+  }
 
   const aiState = getMutableAIState<typeof AI>()
 

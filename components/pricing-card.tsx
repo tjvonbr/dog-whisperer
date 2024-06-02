@@ -1,3 +1,6 @@
+'use client'
+
+import { toast } from 'sonner'
 import { Button } from './ui/button'
 import {
   IconChain,
@@ -7,8 +10,27 @@ import {
   IconLogo,
   IconTrophy
 } from './ui/icons'
+import getStripe from '@/lib/hooks/use-stripe'
 
 export default function PricingCard() {
+  async function handleCheckout() {
+    const stripe = await getStripe()
+
+    const response = await fetch('/api/checkout-session', {
+      method: 'POST'
+    })
+
+    if (!response.ok) {
+      toast.error("We couldn't connect to Stripe at this time.")
+    }
+
+    const data = await response.json()
+
+    return stripe?.redirectToCheckout({
+      sessionId: data.sessionId
+    })
+  }
+
   return (
     <div className="lg:sticky lg:top-32 lg:h-[400px] flex flex-col bg-indigo-50 w-full max-w-[400px] rounded-md shadow-lg">
       <div className="px-2 flex-none h-12 lg:h-14 w-full flex justify-between items-center bg-white rounded-t-md border-b">
@@ -49,7 +71,10 @@ export default function PricingCard() {
             Time to consistently work on your training
           </div>
         </div>
-        <Button className="mt-6 bg-green-500 hover:bg-green-500/90">
+        <Button
+          className="mt-6 bg-green-500 hover:bg-green-500/90"
+          onClick={handleCheckout}
+        >
           Checkout
         </Button>
       </div>

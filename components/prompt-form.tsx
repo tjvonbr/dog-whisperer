@@ -20,6 +20,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { loadStripe } from '@stripe/stripe-js'
 import { User } from '@/lib/types'
+import stripe from '@/server/stripe'
+import getStripe from '@/lib/hooks/use-stripe'
 
 export function PromptForm({
   input,
@@ -28,7 +30,7 @@ export function PromptForm({
 }: {
   input: string
   setInput: (value: string) => void
-  user?: User | null
+  user: User
 }) {
   const router = useRouter()
   const { formRef, onKeyDown } = useEnterSubmit()
@@ -60,11 +62,9 @@ export function PromptForm({
       onSubmit={async (e: any) => {
         e.preventDefault()
 
-        const stripe = await loadStripe(
-          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
-        )
+        const stripe = await getStripe()
 
-        if (!user?.stripeId) {
+        if (!user.stripeId) {
           const response = await fetch('/api/checkout-session', {
             method: 'POST'
           })
@@ -76,7 +76,8 @@ export function PromptForm({
           const data = await response.json()
 
           return stripe?.redirectToCheckout({
-            sessionId: data.sessionId
+            sessionId: data.sessionId,
+            successUrl: process.env.VERCEL_URL + '/checkout/success'
           })
         }
 
