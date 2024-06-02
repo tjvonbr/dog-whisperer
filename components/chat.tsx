@@ -15,7 +15,7 @@ import { User } from '@/lib/types'
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
   id?: string
-  user: User | null
+  user: User
   missingKeys: string[]
 }
 

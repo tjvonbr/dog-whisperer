@@ -1,14 +1,22 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
-import { IconLogo, IconNextChat } from '@/components/ui/icons'
+import { IconLogo, IconNextChat, IconSeparator } from '@/components/ui/icons'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
 import UserMenu from './user-menu'
+import { getUser } from '@/app/actions'
+import { Button } from './ui/button'
+import HeaderCheckoutButton from './checkout-button'
 
 async function UserOrLogin() {
   const { userId } = auth()
+
+  let user = null
+  if (userId) {
+    user = await getUser(userId)
+  }
 
   return (
     <div className="w-full flex justify-between items-center">
@@ -25,7 +33,16 @@ async function UserOrLogin() {
           <IconNextChat className="hidden size-6 mr-2 dark:block" />
         </Link>
       )}
-      <div className="flex items-center">{userId && <UserMenu />}</div>
+      {userId && (
+        <div className="flex items-center space-x-8">
+          <div className="px-4 py-2.5 flex items-center bg-foreground-text text-sm text-black font-semibold">
+            <p>{`${user.credits} credits remaining`}</p>
+            <IconSeparator className="size-5" />
+            <HeaderCheckoutButton />
+          </div>
+          <UserMenu />
+        </div>
+      )}
     </div>
   )
 }

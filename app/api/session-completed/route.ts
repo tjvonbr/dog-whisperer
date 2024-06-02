@@ -1,9 +1,10 @@
 import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/server/stripe'
+import supabase from '@/server/supabase'
 
 export async function POST(req: NextRequest) {
-  const webhookSecret = '{{STRIPE_WEBHOOK_SECRET}}'
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string
 
   if (!webhookSecret) {
     return NextResponse.json(
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
   }
 
   let event
-  const body = await req.json()
+  const body = await req.text()
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
@@ -33,22 +34,33 @@ export async function POST(req: NextRequest) {
   }
 
   switch (event.type) {
+    case 'checkout.session.async_payment_failed':
+      const checkoutSessionAsyncPaymentFailed = event.data.object
+      // Then define and call a function to handle the event checkout.session.async_payment_failed
+      break
+    case 'checkout.session.async_payment_succeeded':
+      const checkoutSessionAsyncPaymentSucceeded = event.data.object
+      // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+      break
     case 'checkout.session.completed':
-      // Payment is successful and the subscription is created.
-      // You should provision the subscription and save the customer ID to your database.
+      const checkout = event.data.object
+
+      const result = await supabase
+        .from('users')
+        .update({
+          subscriptionId: checkout.subscription
+        })
+        .eq('stripeId', checkout.customer)
+
+      // Then define and call a function to handle the event checkout.session.completed
       break
-    case 'invoice.paid':
-      // Continue to provision the subscription as payments continue to be made.
-      // Store the status in your database and check when a user accesses your service.
-      // This approach helps you avoid hitting rate limits.
+    case 'checkout.session.expired':
+      const checkoutSessionExpired = event.data.object
+      // Then define and call a function to handle the event checkout.session.expired
       break
-    case 'invoice.payment_failed':
-      // The payment failed or the customer does not have a valid payment method.
-      // The subscription becomes past_due. Notify your customer and send them to the
-      // customer portal to update their payment information.
-      break
+    // ... handle other event types
     default:
-    // Unhandled event type
+      console.log(`Unhandled event type ${event.type}`)
   }
 
   return NextResponse.json(null, { status: 200 })

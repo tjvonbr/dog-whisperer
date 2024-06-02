@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
           quantity: 1
         }
       ],
-      success_url: `${origin}/?success=true`,
-      cancel_url: `${origin}/?success=false`
+      success_url: `${origin}/checkout/success`,
+      cancel_url: `${origin}/checkout/not-successful`
     })
 
     if (!session) {
