@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/server/stripe'
 import supabase from '@/server/supabase'
+import { User } from '@/lib/types'
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(null, { status: 400 })
   }
 
+  let subscription
   switch (event.type) {
     case 'checkout.session.async_payment_failed':
       const checkoutSessionAsyncPaymentFailed = event.data.object
@@ -45,20 +47,43 @@ export async function POST(req: NextRequest) {
     case 'checkout.session.completed':
       const checkout = event.data.object
 
-      const result = await supabase
-        .from('users')
-        .update({
-          subscriptionId: checkout.subscription
-        })
-        .eq('stripeId', checkout.customer)
-
       // Then define and call a function to handle the event checkout.session.completed
       break
     case 'checkout.session.expired':
       const checkoutSessionExpired = event.data.object
       // Then define and call a function to handle the event checkout.session.expired
       break
+    case 'customer.subscription.created':
+      const sub = event.data.object
+
+      console.log("sub: ", sub)
+
+      const { data: user } = await supabase
+      .from('users')
+      .select()
+      .eq('stripeId', sub.customer)
+      .limit(1)
+      .single()
+      
+      console.log("USER: ", user)
+
+      if (!user) {
+        return NextResponse.json(null, { status: 400})
+      }
+
+      const newSub = await supabase.from("subscriptions").insert({
+        id: sub.id,
+        status: sub.status,
+        userId: user.id,
+      })
+
+      break
     // ... handle other event types
+    case 'customer.subscription.deleted':
+      subscription = event.data.object
+      console.log(subscription)
+      
+      break
     default:
       console.log(`Unhandled event type ${event.type}`)
   }

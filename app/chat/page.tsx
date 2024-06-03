@@ -3,15 +3,18 @@ import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
 import { auth } from '@clerk/nextjs/server'
 import { getMissingKeys, getUser } from '@/app/actions'
+import { redirect } from 'next/navigation'
 
 export default async function ChatPage() {
   const id = nanoid()
   const { userId } = auth()
 
-  let user = null
-  if (userId) {
-    user = await getUser(userId)
+  if (!userId) {
+    redirect('/sign-in')
   }
+
+  const user = await getUser(userId)
+  console.log(user)
 
   const missingKeys = await getMissingKeys()
 

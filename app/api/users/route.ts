@@ -2,7 +2,6 @@ import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { Webhook } from 'svix'
 import { NextResponse } from 'next/server'
-import stripe from '@/server/stripe'
 import { User } from '@/lib/types'
 import { saveUser } from '@/app/actions'
 
@@ -52,20 +51,12 @@ export async function POST(req: Request) {
     })
   }
 
-  const fullName = payload.data.first_name + ' ' + payload.data.last_name
-
-  const customer = await stripe.customers.create({
-    name: fullName,
-    email: payload.data.email_addresses[0].email_address
-  })
-
   const user: User = {
     id: payload.data.id,
     firstName: payload.data.first_name,
     lastName: payload.data.last_name,
     email: payload.data.email_addresses[0].email_address,
-    credits: 3,
-    stripeId: customer.id
+    credits: 5,
   }
 
   await saveUser(user)
