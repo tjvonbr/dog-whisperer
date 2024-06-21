@@ -6,12 +6,13 @@ import { cn } from '@/lib/utils'
 import { SidebarList } from '@/components/sidebar-list'
 import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
+import { User } from '@/lib/types'
 
 interface ChatHistoryProps {
-  userId?: string
+  user: User
 }
 
-export async function ChatHistory({ userId }: ChatHistoryProps) {
+export async function ChatHistory({ user }: ChatHistoryProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4">
@@ -42,7 +43,7 @@ export async function ChatHistory({ userId }: ChatHistoryProps) {
         }
       >
         {/* @ts-ignore */}
-        <SidebarList userId={userId} />
+        <SidebarList user={user} />
       </React.Suspense>
     </div>
   )

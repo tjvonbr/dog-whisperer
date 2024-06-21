@@ -166,7 +166,20 @@ export async function getUser(id: string) {
     return null
   }
 
-  console.log("user: ", user)
+  return user
+}
+
+export async function updateUser(user: User) {
+  const { data: updatedUser } = await supabase
+    .from('users')
+    .update({
+    ...user
+    })
+    .eq('id', user.id)
+
+  if (!user) {
+    return null
+  }
 
   return user
 }

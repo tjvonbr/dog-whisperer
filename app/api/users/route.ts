@@ -54,12 +54,18 @@ export async function POST(req: Request) {
 
   const fullName = payload.data.first_name + ' ' + payload.data.last_name
 
+  const customer = await stripe.customers.create({
+    name: fullName,
+    email: payload.data.email_addresses[0].email_address
+  })
+
   const user: User = {
     id: payload.data.id,
     firstName: payload.data.first_name,
     lastName: payload.data.last_name,
     email: payload.data.email_addresses[0].email_address,
     credits: 5,
+    stripeId: customer.id
   }
 
   await saveUser(user)
