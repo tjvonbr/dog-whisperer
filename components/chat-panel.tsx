@@ -6,7 +6,7 @@ import { shareChat } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
-import { IconShare } from '@/components/ui/icons'
+import { IconSeparator, IconShare } from '@/components/ui/icons'
 import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
 import { useAIState, useActions, useUIState } from 'ai/rsc'
@@ -16,6 +16,7 @@ import { UserMessage } from './stocks/message'
 import { toast } from 'sonner'
 import getStripe from '@/lib/hooks/use-stripe'
 import { User } from '@/lib/types'
+import HeaderCheckoutButton from './checkout-button'
 
 export interface ChatPanelProps {
   id?: string

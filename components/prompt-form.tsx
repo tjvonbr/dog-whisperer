@@ -22,6 +22,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { User } from '@/lib/types'
 import stripe from '@/server/stripe'
 import getStripe from '@/lib/hooks/use-stripe'
+import supabase from '@/server/supabase'
 
 export function PromptForm({
   input,
@@ -64,9 +65,12 @@ export function PromptForm({
 
         const stripe = await getStripe()
 
-        if (!user.stripeId) {
+        if (!user.stripeId && user.credits === 0) {
           const response = await fetch('/api/checkout-session', {
-            method: 'POST'
+            method: 'POST',
+            body: JSON.stringify({
+              userEmail: user.email
+            })
           })
 
           if (!response.ok) {
@@ -79,6 +83,21 @@ export function PromptForm({
             sessionId: data.sessionId,
             successUrl: process.env.VERCEL_URL + '/checkout/success'
           })
+        }
+
+        if (!user.stripeId && user.credits > 0) {
+          const response = await fetch('/api/users/' + user.id, {
+            method: 'PUT',
+            body: JSON.stringify({
+              userId: user.id
+            })
+          })
+
+          if (response.ok) {
+            if (!response.ok) {
+              toast.error("We couldn't spend a credit for you at this time.")
+            }
+          }
         }
 
         // Blur focus on mobile

@@ -12,7 +12,7 @@ import { BotMessage } from '@/components/stocks'
 import { nanoid } from '@/lib/utils'
 import { getUser, saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Chat } from '@/lib/types'
+import { Chat, User } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
 
 async function submitUserMessage(content: string) {

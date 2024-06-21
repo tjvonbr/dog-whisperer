@@ -22,7 +22,7 @@ async function UserOrLogin() {
       {userId ? (
         <>
           <SidebarMobile>
-            <ChatHistory userId={userId} />
+            <ChatHistory user={user} />
           </SidebarMobile>
           <SidebarToggle />
         </>
@@ -32,16 +32,7 @@ async function UserOrLogin() {
           <IconNextChat className="hidden size-6 mr-2 dark:block" />
         </Link>
       )}
-      {userId && (
-        <div className="flex items-center space-x-8">
-          <div className="px-4 py-2.5 flex items-center bg-foreground-text text-sm text-black font-semibold">
-            <p>{`${user.credits} credits remaining`}</p>
-            <IconSeparator className="size-5" />
-            <HeaderCheckoutButton />
-          </div>
-          <UserMenu />
-        </div>
-      )}
+      {userId && <UserMenu />}
     </div>
   )
 }
