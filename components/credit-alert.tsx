@@ -11,8 +11,6 @@ interface CreditAlertProps {
 
 export function CreditAlert({ user }: CreditAlertProps) {
   async function handleCheckout() {
-    const stripe = await getStripe()
-
     const response = await fetch('/api/checkout-session', {
       method: 'POST',
       body: JSON.stringify({
@@ -20,17 +18,16 @@ export function CreditAlert({ user }: CreditAlertProps) {
       })
     })
 
-    console.log(response)
-
     if (!response.ok) {
       toast.error("We couldn't connect to Stripe at this time.")
     }
 
     const data = await response.json()
 
+    const stripe = await getStripe()
+
     return stripe?.redirectToCheckout({
-      sessionId: data.sessionId,
-      successUrl: process.env.VERCEL_URL + '/checkout/success'
+      sessionId: data.sessionId
     })
   }
 

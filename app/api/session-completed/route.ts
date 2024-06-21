@@ -34,9 +34,17 @@ export async function POST(req: NextRequest) {
   }
 
   switch (event.type) {
-    case 'customer.created': 
-      const eventCustomerCreated = event.data.object
-      console.log('eventCustomerCreated: ', eventCustomerCreated)
+    case 'customer.created':
+      const stripeCustomer = event.data.object
+      console.log(stripeCustomer)
+      
+      const user = await supabase.from('users').update({
+        stripeId: stripeCustomer.id,
+      }).eq(
+        "email",
+        stripeCustomer.email
+      )
+
       break
     case 'checkout.session.async_payment_failed':
       const checkoutSessionAsyncPaymentFailed = event.data.object
