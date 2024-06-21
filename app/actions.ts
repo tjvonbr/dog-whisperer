@@ -166,6 +166,8 @@ export async function getUser(id: string) {
     return null
   }
 
+  console.log("user: ", user)
+
   return user
 }
 

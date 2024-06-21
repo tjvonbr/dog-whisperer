@@ -7,7 +7,6 @@ import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
 import UserMenu from './user-menu'
 import { getUser } from '@/app/actions'
-import { Button } from './ui/button'
 import HeaderCheckoutButton from './checkout-button'
 
 async function UserOrLogin() {

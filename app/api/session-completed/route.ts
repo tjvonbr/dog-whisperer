@@ -34,6 +34,10 @@ export async function POST(req: NextRequest) {
   }
 
   switch (event.type) {
+    case 'customer.created': 
+      const eventCustomerCreated = event.data.object
+      console.log('eventCustomerCreated: ', eventCustomerCreated)
+      break
     case 'checkout.session.async_payment_failed':
       const checkoutSessionAsyncPaymentFailed = event.data.object
       // Then define and call a function to handle the event checkout.session.async_payment_failed
