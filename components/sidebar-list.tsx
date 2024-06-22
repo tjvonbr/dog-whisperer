@@ -5,6 +5,8 @@ import { CreditAlert } from './credit-alert'
 import { SidebarItems } from '@/components/sidebar-items'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { User } from '@/lib/types'
+import { getSubscription } from '@/supabase/functions/subscriptions'
+import { CanceledAlert } from './canceled-alert'
 
 interface SidebarListProps {
   user: User
@@ -17,6 +19,7 @@ const loadChats = cache(async (userId?: string) => {
 
 export async function SidebarList({ user }: SidebarListProps) {
   const chats = await loadChats(user.id)
+  const subscription = await getSubscription(user.id)
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -33,7 +36,10 @@ export async function SidebarList({ user }: SidebarListProps) {
       </div>
       <div className="w-full flex flex-col">
         <div className="flex flex-col items-center justify-between p-4">
-          {user && !user.stripeId && <CreditAlert user={user} />}
+          {subscription && subscription.status === 'canceled' && (
+            <CanceledAlert user={user} />
+          )}
+          {!subscription && <CreditAlert user={user} />}
           <div className="w-full flex justify-between items-center">
             <ThemeToggle />
             <ClearHistory
