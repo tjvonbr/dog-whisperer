@@ -34,15 +34,64 @@ export async function POST(req: NextRequest) {
   }
 
   switch (event.type) {
-    case 'customer.created':
-      const stripeCustomer = event.data.object
-      console.log(stripeCustomer)
-      
-      const user = await supabase.from('users').update({
-        stripeId: stripeCustomer.id,
+    case 'customer.subscription.created':
+      const newSub = event.data.object
+
+      const { data: user } = await supabase.from('users').select('id').eq('stripeId', newSub.customer).limit(1).single()
+
+      if (!user) {
+        break
+      }
+
+      await supabase.from('subscriptions').insert({
+        id: newSub.id,
+        status: newSub.status,
+        userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+
+      await supabase.from('users').update({
+        subscriptionId: newSub.id,
+        updatedAt: new Date()
       }).eq(
-        "email",
-        stripeCustomer.email
+        "stripeId",
+        newSub.customer
+      )
+
+      break
+    case 'customer.subscription.updated':
+      const updatedSub = event.data.object
+      console.log('updated sub: ' , updatedSub)
+
+      await supabase.from('subscriptions').update({
+        status: updatedSub.status,
+        updatedAt: new Date()
+      }).eq(
+        "id",
+        updatedSub.id
+      )
+
+      break
+    case 'customer.subscription.deleted':
+      const deletedSub = event.data.object
+
+      await supabase.from('subscriptions').update({
+        status: deletedSub.status
+      }).eq(
+        "id",
+        deletedSub.id
+      )
+
+      break
+    case 'invoice.paid':
+      const invoice = event.data.object
+      
+      await supabase.from('subscriptions').update({
+        status: 'active'
+      }).eq(
+        'id',
+        invoice.subscription
       )
 
       break
