@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useUIState, useAIState } from 'ai/rsc'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Message } from '@/lib/chat/actions'
@@ -21,7 +21,7 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 
 export function Chat({ id, className, user, missingKeys }: ChatProps) {
   const router = useRouter()
-  const path = usePathname()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const [input, setInput] = useState('')
@@ -30,23 +30,38 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
 
   const [_, setNewChatId] = useLocalStorage('newChatId', id)
 
+  const toastShownRef = useRef({ success: false, canceled: false })
+
   useEffect(() => {
-    if (searchParams.get('success')) {
+    const success = searchParams.get('success')
+    const canceled = searchParams.get('canceled')
+
+    if (success && !toastShownRef.current.success) {
       toast('Success')
+      toastShownRef.current.success = true
+      // Create a new URLSearchParams without the 'success' parameter
+      const newSearchParams = new URLSearchParams(searchParams)
+      newSearchParams.delete('success')
+      router.replace(`${pathname}?${newSearchParams.toString()}`)
     }
 
-    if (searchParams.get('canceled')) {
+    if (canceled && !toastShownRef.current.canceled) {
       toast('Canceled')
+      toastShownRef.current.canceled = true
+      // Create a new URLSearchParams without the 'canceled' parameter
+      const newSearchParams = new URLSearchParams(searchParams)
+      newSearchParams.delete('canceled')
+      router.replace(`${pathname}?${newSearchParams.toString()}`)
     }
-  })
+  }, [searchParams, router, pathname])
 
   useEffect(() => {
     if (user) {
-      if (path.includes('chat') && messages.length === 1) {
+      if (pathname.includes('chat') && messages.length === 1) {
         window.history.replaceState({}, '', `/chat/${id}`)
       }
     }
-  }, [id, path, user, messages])
+  }, [id, pathname, user, messages])
 
   useEffect(() => {
     const messagesLength = aiState.messages?.length
