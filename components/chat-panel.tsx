@@ -15,7 +15,7 @@ import { nanoid } from 'nanoid'
 import { UserMessage } from './stocks/message'
 import { toast } from 'sonner'
 import getStripe from '@/lib/hooks/use-stripe'
-import { User } from '@/lib/types'
+import { Subscription, User } from '@/lib/types'
 import HeaderCheckoutButton from './checkout-button'
 
 export interface ChatPanelProps {
@@ -25,6 +25,7 @@ export interface ChatPanelProps {
   setInput: (value: string) => void
   isAtBottom: boolean
   scrollToBottom: () => void
+  subscription: Subscription | null
   user: User
 }
 
@@ -35,6 +36,7 @@ export function ChatPanel({
   setInput,
   isAtBottom,
   scrollToBottom,
+  subscription,
   user
 }: ChatPanelProps) {
   const [aiState] = useAIState()
@@ -157,7 +159,12 @@ export function ChatPanel({
         ) : null}
 
         <div className="space-y-4 border-t bg-background px-4 py-2 shadow-lg sm:rounded-t-xl sm:border md:py-4">
-          <PromptForm input={input} setInput={setInput} user={user} />
+          <PromptForm
+            input={input}
+            setInput={setInput}
+            subscription={subscription}
+            user={user}
+          />
           <FooterText className="hidden sm:block" />
         </div>
       </div>

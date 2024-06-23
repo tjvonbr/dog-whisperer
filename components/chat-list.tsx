@@ -2,6 +2,7 @@ import { UIState } from '@/lib/chat/actions'
 import Link from 'next/link'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { cn } from '@/lib/utils'
+import { Subscription } from '@/lib/types'
 
 export interface ChatList {
   messages: UIState

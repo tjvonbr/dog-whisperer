@@ -10,16 +10,23 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Message } from '@/lib/chat/actions'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
-import { User } from '@/lib/types'
+import { Subscription, User } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
   id?: string
+  subscription: Subscription | null
   user: User
   missingKeys: string[]
 }
 
-export function Chat({ id, className, user, missingKeys }: ChatProps) {
+export function Chat({
+  id,
+  className,
+  user,
+  missingKeys,
+  subscription
+}: ChatProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -59,7 +66,7 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
       newSearchParams.delete('canceled')
       router.replace(`${pathname}?${newSearchParams.toString()}`)
     }
-  }, [searchParams, router, pathname])
+  }, [searchParams, router, pathname, user.credits])
 
   useEffect(() => {
     if (user) {
@@ -107,6 +114,7 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
         setInput={setInput}
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
+        subscription={subscription}
         user={user}
       />
     </div>

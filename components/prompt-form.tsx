@@ -2,9 +2,7 @@
 
 import * as React from 'react'
 import Textarea from 'react-textarea-autosize'
-
 import { useActions, useUIState } from 'ai/rsc'
-
 import { UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
@@ -16,24 +14,24 @@ import {
 } from '@/components/ui/tooltip'
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { loadStripe } from '@stripe/stripe-js'
-import { User } from '@/lib/types'
-import stripe from '@/server/stripe'
+import { Subscription, User } from '@/lib/types'
 import getStripe from '@/lib/hooks/use-stripe'
-import supabase from '@/server/supabase'
 
 export function PromptForm({
   input,
   setInput,
+  subscription,
   user
 }: {
   input: string
   setInput: (value: string) => void
+  subscription: Subscription | null
   user: User
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { formRef, onKeyDown } = useEnterSubmit()
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
@@ -63,13 +61,12 @@ export function PromptForm({
       onSubmit={async (e: any) => {
         e.preventDefault()
 
-        const stripe = await getStripe()
-
         if (!user.stripeId && user.credits === 0) {
           const response = await fetch('/api/checkout-session', {
             method: 'POST',
             body: JSON.stringify({
-              userEmail: user.email
+              userEmail: user.email,
+              returnPath: pathname
             })
           })
 
@@ -79,13 +76,17 @@ export function PromptForm({
 
           const data = await response.json()
 
+          const stripe = await getStripe()
+
           return stripe?.redirectToCheckout({
-            sessionId: data.sessionId,
-            successUrl: process.env.VERCEL_URL + '/checkout/success'
+            sessionId: data.sessionId
           })
         }
 
-        if (!user.stripeId && user.credits > 0) {
+        if (
+          !subscription ||
+          (subscription.status !== 'active' && user.credits > 0)
+        ) {
           const response = await fetch('/api/users/' + user.id, {
             method: 'PUT',
             body: JSON.stringify({

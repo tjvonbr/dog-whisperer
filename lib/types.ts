@@ -37,3 +37,10 @@ export interface User extends Record<string, any> {
   credits: number
   stripeId?: string
 }
+
+export interface Subscription extends Record<string, any> {
+  id: string
+  userId: string
+  stripeId: string
+  status: string
+}
