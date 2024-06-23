@@ -1,72 +1,51 @@
-import { headers } from 'next/headers'
-import { WebhookEvent } from '@clerk/nextjs/server'
-import { Webhook } from 'svix'
-import { NextResponse } from 'next/server'
-import stripe from '@/server/stripe'
-import { User } from '@/lib/types'
-import { saveUser } from '@/app/actions'
+import { clerkClient } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+import { formSchema } from "@/lib/validations/auth";
+import stripe from "@/server/stripe";
+import { saveUser } from "@/app/actions";
+import { User } from "@/lib/types";
 
-export async function POST(req: Request) {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
-  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
+export async function POST(req: NextRequest) {
+  const json = await req.json();
+  const body = formSchema.parse(json);
 
-  if (!WEBHOOK_SECRET) {
-    throw new Error(
-      'Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local'
-    )
-  }
-
-  // Get the headers
-  const headerPayload = headers()
-  const svix_id = headerPayload.get('svix-id')
-  const svix_timestamp = headerPayload.get('svix-timestamp')
-  const svix_signature = headerPayload.get('svix-signature')
-
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response('Error occurred -- no svix headers', {
-      status: 400
-    })
-  }
-
-  // Get the body
-  const payload = await req.json()
-  const body = JSON.stringify(payload)
-
-  // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET)
-
-  let evt: WebhookEvent
-
-  // Verify the payload with the headers
   try {
-    evt = wh.verify(body, {
-      'svix-id': svix_id,
-      'svix-timestamp': svix_timestamp,
-      'svix-signature': svix_signature
-    }) as WebhookEvent
-  } catch (err) {
-    console.error('Error verifying webhook:', err)
-    return new Response('Error occured', {
-      status: 400
+    const clerkUser = await clerkClient.users.createUser({
+      firstName: body.firstName,
+      lastName: body.lastName,
+      emailAddress: [body.email],
+    });
+
+    if (!clerkUser) {
+      return NextResponse.json("An error occured creating a Clerk user.", {
+        status: 400,
+      });
+    }
+
+    const stripeCustomer = await stripe.customers.create({
+      name: body.firstName + " " + body.lastName,
+      email: body.email,
     })
+
+    const user: User = {
+      id: clerkUser.id,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      stripeId: stripeCustomer.id,
+      credits: 5
+    }
+
+    const newUser = await saveUser(user)
+
+    if (!newUser) {
+      return NextResponse.json("An error occured creating a user.", {
+        status: 400,
+      });
+    }
+
+    return NextResponse.json(null, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(null, { status: 500 });
   }
-
-  const stripeCustomer = await stripe.customers.create({
-    name: payload.data.first_name + " " + payload.data.last_name,
-    email: payload.data.email_addresses[0].email_address,
-  })
-
-  const user: User = {
-    id: payload.data.id,
-    firstName: payload.data.first_name,
-    lastName: payload.data.last_name,
-    email: payload.data.email_addresses[0].email_address,
-    stripeId: stripeCustomer.id,
-    credits: 5,
-  }
-
-  await saveUser(user)
-
-  return new NextResponse(null, { status: 200 })
 }
