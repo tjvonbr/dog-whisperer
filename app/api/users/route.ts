@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
       credits: 5
     }
 
+    console.log('USER: ', user)
+
     const newUser = await saveUser(user)
 
     if (!newUser) {
