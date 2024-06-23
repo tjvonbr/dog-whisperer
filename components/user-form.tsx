@@ -27,7 +27,6 @@ export default function UserForm() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
     setIsLoading(true)
 
     const response = await fetch('/api/users', {
