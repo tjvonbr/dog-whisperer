@@ -6,7 +6,7 @@ import { ChatPanel } from '@/components/chat-panel'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { useEffect, useState } from 'react'
 import { useUIState, useAIState } from 'ai/rsc'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Message } from '@/lib/chat/actions'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
@@ -22,11 +22,23 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 export function Chat({ id, className, user, missingKeys }: ChatProps) {
   const router = useRouter()
   const path = usePathname()
+  const searchParams = useSearchParams()
+
   const [input, setInput] = useState('')
   const [messages] = useUIState()
   const [aiState] = useAIState()
 
   const [_, setNewChatId] = useLocalStorage('newChatId', id)
+
+  useEffect(() => {
+    if (searchParams.get('success')) {
+      toast('Success')
+    }
+
+    if (searchParams.get('canceled')) {
+      toast('Canceled')
+    }
+  })
 
   useEffect(() => {
     if (user) {
