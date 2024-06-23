@@ -37,7 +37,10 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
     const canceled = searchParams.get('canceled')
 
     if (success && !toastShownRef.current.success) {
-      toast('Success')
+      toast('Success!', {
+        description: 'ou can now start chatting with your AI assistant.',
+        dismissible: true
+      })
       toastShownRef.current.success = true
       // Create a new URLSearchParams without the 'success' parameter
       const newSearchParams = new URLSearchParams(searchParams)
@@ -46,7 +49,10 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
     }
 
     if (canceled && !toastShownRef.current.canceled) {
-      toast('Canceled')
+      toast('Canceled', {
+        description: `That's alright!  You still have ${user.credits} credits left.`,
+        dismissible: true
+      })
       toastShownRef.current.canceled = true
       // Create a new URLSearchParams without the 'canceled' parameter
       const newSearchParams = new URLSearchParams(searchParams)
