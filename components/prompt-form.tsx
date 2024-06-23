@@ -90,7 +90,8 @@ export function PromptForm({
           const response = await fetch('/api/users/' + user.id, {
             method: 'PUT',
             body: JSON.stringify({
-              userId: user.id
+              ...user,
+              credits: user.credits - 1
             })
           })
 

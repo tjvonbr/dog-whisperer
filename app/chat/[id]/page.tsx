@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { getChat, getMissingKeys, getUser } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
+import { getSubscription } from '@/supabase/functions/subscriptions'
 
 export interface ChatPageProps {
   params: {
@@ -51,6 +52,8 @@ export default async function ChatPage({ params }: ChatPageProps) {
     notFound()
   }
 
+  const subscription = await getSubscription(userId)
+
   return (
     <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
       <Chat
@@ -58,6 +61,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
         user={user}
         initialMessages={chat.messages}
         missingKeys={missingKeys}
+        subscription={subscription}
       />
     </AI>
   )
