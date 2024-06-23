@@ -4,17 +4,21 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert'
 import getStripe from '@/lib/hooks/use-stripe'
 import { toast } from 'sonner'
 import { User } from '@/lib/types'
+import { usePathname } from 'next/navigation'
 
 interface CreditAlertProps {
   user: User
 }
 
 export function CreditAlert({ user }: CreditAlertProps) {
+  const pathname = usePathname()
+
   async function handleCheckout() {
     const response = await fetch('/api/checkout-session', {
       method: 'POST',
       body: JSON.stringify({
-        userEmail: user.email
+        userEmail: user.email,
+        returnPath: pathname
       })
     })
 
