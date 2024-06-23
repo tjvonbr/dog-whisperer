@@ -145,13 +145,16 @@ export async function saveChat(chat: Chat) {
 }
 
 export async function saveUser(user: User) {
-  await supabase.from('users').insert({
+  const { data: newUser } = await supabase.from('users').insert({
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
     stripeId: user.stripeId
   })
+    .select()
+  
+  return newUser
 }
 
 export async function getUser(id: string) {
