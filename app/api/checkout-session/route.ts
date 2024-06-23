@@ -16,12 +16,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User is not authenticated' }, { status: 401 })
   }
 
-  const user: User = await getUser(userId)
-
-  const json = await req.json()
-  const body = checkoutSchema.parse(json)
-
-  const origin = req.nextUrl.origin
+  const user = await getUser(userId)
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -34,8 +29,8 @@ export async function POST(req: NextRequest) {
           quantity: 1
         }
       ],
-      success_url: `${origin}/checkout/success`,
-      cancel_url: `${origin}/checkout/not-successful`
+      success_url: `${req.nextUrl.origin}/?success=true`,
+      cancel_url: `${req.nextUrl.origin}/?canceled=true`,
     })
 
     
