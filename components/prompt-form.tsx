@@ -22,11 +22,13 @@ import getStripe from '@/lib/hooks/use-stripe'
 export function PromptForm({
   input,
   setInput,
+  setUser,
   subscription,
   user
 }: {
   input: string
   setInput: (value: string) => void
+  setUser: (value: User) => void
   subscription: Subscription | null
   user: User
 }) {
@@ -95,11 +97,12 @@ export function PromptForm({
             })
           })
 
-          if (response.ok) {
-            if (!response.ok) {
-              toast.error("We couldn't spend a credit for you at this time.")
-            }
+          if (!response.ok) {
+            toast.error("We couldn't spend a credit for you at this time.")
           }
+
+          const data = await response.json()
+          setUser(data)
         }
 
         // Blur focus on mobile
@@ -126,6 +129,16 @@ export function PromptForm({
         setMessages(currentMessages => [...currentMessages, responseMessage])
       }}
     >
+      {!subscription && (
+        <p className="mb-2 w-full text-center text-red-500 text-sm mx-auto">
+          You have <span className="font-bold">{user.credits}</span> credits
+          left. Purchase your subscription{' '}
+          <span className="text-red-500 underline hover:cursor-pointer">
+            here
+          </span>
+          .
+        </p>
+      )}
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
         <Tooltip>
           <TooltipTrigger asChild>
@@ -161,7 +174,11 @@ export function PromptForm({
         <div className="absolute right-0 top-[13px] sm:right-4">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="submit" size="icon" disabled={input === ''}>
+              <Button
+                type="submit"
+                size="icon"
+                disabled={input === '' || user.credits === 0}
+              >
                 <IconArrowElbow />
                 <span className="sr-only">Send message</span>
               </Button>
