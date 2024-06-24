@@ -1,7 +1,6 @@
 import { cache } from 'react'
 import { clearChats, getChats } from '@/app/actions'
 import { ClearHistory } from '@/components/clear-history'
-import { CreditAlert } from './credit-alert'
 import { SidebarItems } from '@/components/sidebar-items'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { User } from '@/lib/types'
@@ -39,7 +38,6 @@ export async function SidebarList({ user }: SidebarListProps) {
           {subscription && subscription.status === 'canceled' && (
             <CanceledAlert user={user} />
           )}
-          {!subscription && <CreditAlert user={user} />}
           <div className="w-full flex justify-between items-center">
             <ThemeToggle />
             <ClearHistory

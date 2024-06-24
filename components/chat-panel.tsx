@@ -37,12 +37,13 @@ export function ChatPanel({
   isAtBottom,
   scrollToBottom,
   subscription,
-  user
+  user: propsUser
 }: ChatPanelProps) {
   const [aiState] = useAIState()
   const [messages, setMessages] = useUIState<typeof AI>()
   const { submitUserMessage } = useActions()
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
+  const [user, setUser] = React.useState<User>(propsUser)
 
   const popularQueries = [
     {
@@ -162,6 +163,7 @@ export function ChatPanel({
           <PromptForm
             input={input}
             setInput={setInput}
+            setUser={setUser}
             subscription={subscription}
             user={user}
           />
