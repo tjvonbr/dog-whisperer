@@ -133,7 +133,30 @@ export function PromptForm({
         <p className="mb-2 w-full text-center text-red-500 text-sm mx-auto">
           You have <span className="font-bold">{user.credits}</span> credits
           left. Purchase your subscription{' '}
-          <span className="text-red-500 underline hover:cursor-pointer">
+          <span
+            className="text-red-500 underline hover:cursor-pointer"
+            onClick={async () => {
+              const response = await fetch('/api/checkout-session', {
+                method: 'POST',
+                body: JSON.stringify({
+                  userEmail: user.email,
+                  returnPath: pathname
+                })
+              })
+
+              if (!response.ok) {
+                toast.error("We couldn't connect to Stripe at this time.")
+              }
+
+              const data = await response.json()
+
+              const stripe = await getStripe()
+
+              return stripe?.redirectToCheckout({
+                sessionId: data.sessionId
+              })
+            }}
+          >
             here
           </span>
           .
