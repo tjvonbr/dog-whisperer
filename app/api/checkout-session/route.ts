@@ -33,6 +33,9 @@ export async function POST(req: NextRequest) {
           quantity: 1
         }
       ],
+      discounts: [{
+        coupon: process.env.STRIPE_LAUNCH_DISCOUNT_ID as string
+      }],
       success_url: `${returnUrl}/?success=true`,
       cancel_url: `${returnUrl}/?canceled=true`,
     })
