@@ -19,7 +19,10 @@ export default async function ChatPage() {
     await getMissingKeys()
   ])
 
-  console.log(user)
+  if (!user) {
+    redirect('/sign-up')
+  }
+
   const id = nanoid()
 
   return (
