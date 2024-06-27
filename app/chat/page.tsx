@@ -19,6 +19,7 @@ export default async function ChatPage() {
     await getMissingKeys()
   ])
 
+  console.log(user)
   const id = nanoid()
 
   return (
