@@ -45,7 +45,7 @@ export function Chat({
 
     if (success && !toastShownRef.current.success) {
       toast('Success!', {
-        description: 'ou can now start chatting with your AI assistant.',
+        description: 'You can now start chatting with your AI assistant.',
         dismissible: true
       })
       toastShownRef.current.success = true
