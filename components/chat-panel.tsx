@@ -116,10 +116,14 @@ export function ChatPanel({
                     example.message
                   )
 
+                  console.log(responseMessage)
+
                   setMessages(currentMessages => [
                     ...currentMessages,
                     responseMessage
                   ])
+
+                  return
                 }}
               >
                 <div className="text-sm font-semibold">{example.heading}</div>
