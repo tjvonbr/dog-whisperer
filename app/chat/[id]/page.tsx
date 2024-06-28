@@ -27,9 +27,6 @@ export async function generateMetadata({
   }
 }
 
-export const runtime = 'edge'
-export const maxDuration = 300
-
 export default async function ChatPage({ params }: ChatPageProps) {
   const { userId } = auth()
 
