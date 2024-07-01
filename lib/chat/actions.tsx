@@ -12,8 +12,120 @@ import { BotMessage } from '@/components/stocks'
 import { nanoid } from '@/lib/utils'
 import { getUser, saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Chat, User } from '@/lib/types'
+import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
+import { readFile, writeFile } from 'fs/promises'
+import path from 'path'
+import os from 'os'
+
+function getMimeType(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase()
+  switch (ext) {
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg'
+    case '.png':
+      return 'image/png'
+    // Add more cases as needed
+    default:
+      return 'application/octet-stream'
+  }
+}
+
+async function generateDogNames(formData: FormData) {
+  'use server'
+
+  const aiState = getMutableAIState<typeof AI>()
+
+  const file = formData.get('file') as File
+  if (!file) {
+    throw new Error('No file uploaded')
+  }
+
+  // Create a temporary file
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
+
+  // Save to temp file
+  const tempDir = os.tmpdir()
+  const tempFilePath = path.join(
+    tempDir,
+    `upload-${nanoid()}.${file.name.split('.').pop()}`
+  )
+  await writeFile(tempFilePath, buffer)
+
+  // Read the file and convert to base64
+  const fileBuffer = await readFile(tempFilePath)
+  const base64Data = fileBuffer.toString('base64')
+
+  console.log('BASE 64: ', base64Data.substring(0, 100))
+
+  aiState.update({
+    ...aiState.get(),
+    messages: [
+      ...aiState.get().messages,
+      {
+        id: nanoid(),
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            image: base64Data
+          }
+        ]
+      }
+    ]
+  })
+
+  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
+  let textNode: undefined | React.ReactNode
+
+  const result = await streamUI({
+    model: anthropic('claude-3-sonnet-20240229'),
+    initial: <SpinnerMessage />,
+    system:
+      'Come up with a list of dog names for the dog featured in the photo.  Offer some names for both males and females so the owner can decide.',
+    messages: [
+      ...aiState.get().messages.map((message: any) => ({
+        role: message.role,
+        content: message.content,
+        name: message.name
+      }))
+    ],
+    text: ({ content, done, delta }) => {
+      if (!textStream) {
+        textStream = createStreamableValue('')
+        textNode = <BotMessage content={textStream.value} />
+      }
+
+      if (done) {
+        textStream.done()
+        aiState.done({
+          ...aiState.get(),
+          messages: [
+            ...aiState.get().messages,
+            {
+              id: nanoid(),
+              role: 'assistant',
+              content
+            }
+          ]
+        })
+      } else {
+        textStream.update(delta)
+      }
+
+      return textNode
+    }
+  })
+
+  console.log('RESULT: ', result)
+
+  return {
+    id: nanoid(),
+    display: result.value
+  }
+}
 
 async function submitUserMessage(content: string) {
   'use server'
@@ -98,7 +210,7 @@ async function submitUserMessage(content: string) {
 
 export type Message = {
   role: 'user' | 'assistant' | 'system' | 'function' | 'data' | 'tool'
-  content: string
+  content: any
   id: string
   name?: string
 }
@@ -116,6 +228,7 @@ export type UIState = {
 
 export const AI = createAI<AIState, UIState>({
   actions: {
+    generateDogNames,
     submitUserMessage
   },
   initialUIState: [],

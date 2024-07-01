@@ -2,19 +2,13 @@ import { auth } from '@clerk/nextjs/server'
 import { Sidebar } from '@/components/sidebar'
 import { ChatHistory } from '@/components/chat-history'
 import { getUser } from '@/app/actions'
-import { redirect } from 'next/navigation'
 
 export async function SidebarDesktop() {
   const { userId } = auth()
 
-  if (!userId) {
-    redirect('/sign-in')
-  }
-
-  const user = await getUser(userId)
-
-  if (!user) {
-    redirect('/sign-up')
+  let user = null
+  if (userId) {
+    user = await getUser(userId)
   }
 
   return (

@@ -17,8 +17,8 @@ const loadChats = cache(async (userId?: string) => {
 })
 
 export async function SidebarList({ user }: SidebarListProps) {
-  const chats = await loadChats(user.id)
-  const subscription = await getSubscription(user.id)
+  const chats = await loadChats(user?.id)
+  const subscription = await getSubscription(user?.id)
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">

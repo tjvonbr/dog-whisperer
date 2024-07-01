@@ -9,7 +9,7 @@ import { IconPlus } from '@/components/ui/icons'
 import { User } from '@/lib/types'
 
 interface ChatHistoryProps {
-  user: User
+  user: User | null
 }
 
 export async function ChatHistory({ user }: ChatHistoryProps) {
