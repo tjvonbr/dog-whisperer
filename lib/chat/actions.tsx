@@ -18,20 +18,6 @@ import { readFile, writeFile } from 'fs/promises'
 import path from 'path'
 import os from 'os'
 
-function getMimeType(filePath: string): string {
-  const ext = path.extname(filePath).toLowerCase()
-  switch (ext) {
-    case '.jpg':
-    case '.jpeg':
-      return 'image/jpeg'
-    case '.png':
-      return 'image/png'
-    // Add more cases as needed
-    default:
-      return 'application/octet-stream'
-  }
-}
-
 async function generateDogNames(formData: FormData) {
   'use server'
 
@@ -57,8 +43,6 @@ async function generateDogNames(formData: FormData) {
   // Read the file and convert to base64
   const fileBuffer = await readFile(tempFilePath)
   const base64Data = fileBuffer.toString('base64')
-
-  console.log('BASE 64: ', base64Data.substring(0, 100))
 
   aiState.update({
     ...aiState.get(),
