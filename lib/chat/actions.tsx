@@ -14,12 +14,11 @@ import { getUser, saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
+import fs from 'fs/promises'
+import path from 'path'
+import os from 'os'
 
 async function generateDogNames(formData: FormData) {
-  const fs = await import('fs/promises')
-  const path = await import('path')
-  const os = await import('os')
-
   const aiState = getMutableAIState<typeof AI>()
 
   const file = formData.get('file') as File
