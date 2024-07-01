@@ -6,7 +6,7 @@ import { useActions, useUIState } from 'ai/rsc'
 import { UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
-import { IconArrowElbow, IconAttachment, IconPlus } from '@/components/ui/icons'
+import { IconArrowElbow, IconAttachment } from '@/components/ui/icons'
 import {
   Tooltip,
   TooltipContent,
@@ -39,11 +39,11 @@ export function FreePromptForm({
     image: null
   })
 
-  const hiddenFileInput = React.useRef(null)
+  const hiddenFileInput = React.useRef<HTMLInputElement | null>(null)
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
-    hiddenFileInput && hiddenFileInput.current.click()
+    hiddenFileInput.current?.click()
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -95,7 +95,7 @@ export function FreePromptForm({
         ])
 
         const formData = new FormData()
-        formData.append('file', file!)
+        formData.append('file', data.image as string)
 
         const responseMessage = await generateDogNames(formData)
         setMessages(currentMessages => [...currentMessages, responseMessage])
