@@ -95,7 +95,7 @@ export function FreePromptForm({
         ])
 
         const formData = new FormData()
-        formData.append('file', file!)
+        formData.append('file', data.image as string)
 
         const responseMessage = await generateDogNames(formData)
         setMessages(currentMessages => [...currentMessages, responseMessage])

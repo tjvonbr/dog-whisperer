@@ -14,33 +14,14 @@ import { getUser, saveChat } from '@/app/actions'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
-import fs from 'fs/promises'
-import path from 'path'
-import os from 'os'
 
 async function generateDogNames(formData: FormData) {
   const aiState = getMutableAIState<typeof AI>()
 
-  const file = formData.get('file') as File
+  const file = formData.get('file') as string
   if (!file) {
     throw new Error('No file uploaded')
   }
-
-  // Create a temporary file
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-
-  // Save to temp file
-  const tempDir = os.tmpdir()
-  const tempFilePath = path.join(
-    tempDir,
-    `upload-${nanoid()}.${file.name.split('.').pop()}`
-  )
-  await fs.writeFile(tempFilePath, buffer)
-
-  // Read the file and convert to base64
-  const fileBuffer = await fs.readFile(tempFilePath)
-  const base64Data = fileBuffer.toString('base64')
 
   aiState.update({
     ...aiState.get(),
@@ -52,7 +33,7 @@ async function generateDogNames(formData: FormData) {
         content: [
           {
             type: 'image',
-            image: base64Data
+            image: file
           }
         ]
       }
