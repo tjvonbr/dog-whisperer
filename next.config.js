@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
+  experimental: {
+    serverComponentsExternalPackages: ['fs', 'os', 'path']
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
