@@ -16,7 +16,6 @@ import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
 
 async function generateDogNames(formData: FormData) {
-  'use server'
   const fs = await import('fs/promises')
   const path = await import('path')
   const os = await import('os')
@@ -112,8 +111,6 @@ async function generateDogNames(formData: FormData) {
 }
 
 async function submitUserMessage(content: string) {
-  'use server'
-
   const { userId } = auth()
 
   if (!userId) {

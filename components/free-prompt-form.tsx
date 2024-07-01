@@ -6,7 +6,7 @@ import { useActions, useUIState } from 'ai/rsc'
 import { UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
-import { IconArrowElbow, IconAttachment, IconPlus } from '@/components/ui/icons'
+import { IconArrowElbow, IconAttachment } from '@/components/ui/icons'
 import {
   Tooltip,
   TooltipContent,
