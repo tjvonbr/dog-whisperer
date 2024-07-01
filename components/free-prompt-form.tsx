@@ -41,7 +41,7 @@ export function FreePromptForm({
 
   const hiddenFileInput = React.useRef<HTMLInputElement | null>(null)
 
-  function handleClick(e: React.MouseEvent<HTMLInputElement>) {
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
     hiddenFileInput.current && hiddenFileInput.current.click()
   }
