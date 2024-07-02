@@ -16,6 +16,8 @@ import { Chat } from '@/lib/types'
 import { auth } from '@clerk/nextjs/server'
 
 async function generateDogNames(formData: FormData) {
+  'use server'
+
   const aiState = getMutableAIState<typeof AI>()
 
   const file = formData.get('file') as string
@@ -44,7 +46,7 @@ async function generateDogNames(formData: FormData) {
   let textNode: undefined | React.ReactNode
 
   const result = await streamUI({
-    model: anthropic('claude-3-sonnet-20240229'),
+    model: anthropic('claude-3-5-sonnet-20240620'),
     initial: <SpinnerMessage />,
     system:
       'Come up with a list of dog names for the dog featured in the photo.  Offer some names for both males and females so the owner can decide.',
@@ -91,6 +93,8 @@ async function generateDogNames(formData: FormData) {
 }
 
 async function submitUserMessage(content: string) {
+  'use server'
+
   const { userId } = auth()
 
   if (!userId) {
@@ -125,7 +129,7 @@ async function submitUserMessage(content: string) {
   let textNode: undefined | React.ReactNode
 
   const result = await streamUI({
-    model: anthropic('claude-2.0'),
+    model: anthropic('claude-3-5-sonnet-20240620'),
     initial: <SpinnerMessage />,
     system:
       'You are a world-class dog training conversation bot named Zoe and you can help users train their dogs and solve undesired behaviors, step by step.  Your responses should be overly positive and encouraging.',
