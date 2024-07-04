@@ -16,13 +16,27 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { IconShare, IconSpinner, IconTrash } from '@/components/ui/icons'
+import {
+  IconSpinner,
+  IconEllipsis,
+  IconTrash,
+  IconShare,
+  IconPencil
+} from '@/components/ui/icons'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from './ui/dropdown-menu'
+import { RenameChatDialog } from './rename-chat-dialog'
 
 interface SidebarActionsProps {
   chat: Chat
@@ -38,6 +52,7 @@ export function SidebarActions({
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
+  const [renameDialogOpen, setRenameDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
 
   return (
@@ -45,30 +60,42 @@ export function SidebarActions({
       <div className="">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className="size-7 p-0 hover:bg-background"
-              onClick={() => setShareDialogOpen(true)}
-            >
-              <IconShare />
-              <span className="sr-only">Share</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  variant="ghost"
+                  className="size-7 p-0 hover:bg-background"
+                  onClick={() => console.log('hello')}
+                >
+                  <IconEllipsis />
+                  <span className="sr-only">Edit chat</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 mr-4">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    className="text-sm"
+                    onClick={() => setRenameDialogOpen(true)}
+                  >
+                    <IconPencil className="mr-2" />
+                    Rename chat
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShareDialogOpen(true)}>
+                    <IconShare className="mr-2" />
+                    Share chat
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-sm text-red-500 hover:text-red-700"
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    <IconTrash className="mr-2" />
+                    Delete chat
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </TooltipTrigger>
-          <TooltipContent>Share chat</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className="size-7 p-0 hover:bg-background"
-              disabled={isRemovePending}
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <IconTrash />
-              <span className="sr-only">Delete</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Delete chat</TooltipContent>
+          <TooltipContent>Edit chat</TooltipContent>
         </Tooltip>
       </div>
       <ChatShareDialog
@@ -77,6 +104,11 @@ export function SidebarActions({
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
         onCopy={() => setShareDialogOpen(false)}
+      />
+      <RenameChatDialog
+        chat={chat}
+        open={renameDialogOpen}
+        setRenameDialogOpen={setRenameDialogOpen}
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
