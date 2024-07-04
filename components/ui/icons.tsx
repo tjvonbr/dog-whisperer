@@ -59,6 +59,20 @@ function IconCommunity({ className, ...props }: React.ComponentProps<'svg'>) {
   )
 }
 
+function IconEllipsis({ className, ...props }: React.ComponentProps<'svg'>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+      className={cn('size-4', className)}
+      viewBox="0 0 256 256"
+      {...props}
+    >
+      <path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z" />
+    </svg>
+  )
+}
+
 function IconHouse({ className, ...props }: React.ComponentProps<'svg'>) {
   return (
     <svg
@@ -69,6 +83,20 @@ function IconHouse({ className, ...props }: React.ComponentProps<'svg'>) {
       {...props}
     >
       <path d="M240,208H224V136l2.34,2.34A8,8,0,0,0,237.66,127L139.31,28.68a16,16,0,0,0-22.62,0L18.34,127a8,8,0,0,0,11.32,11.31L32,136v72H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,120l80-80,80,80v88H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48Zm96,88H112V160h32Z" />
+    </svg>
+  )
+}
+
+function IconPencil({ className, ...props }: React.ComponentProps<'svg'>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+      className={cn('size-4', className)}
+      viewBox="0 0 256 256"
+      {...props}
+    >
+      <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z" />
     </svg>
   )
 }
@@ -604,7 +632,9 @@ export {
   IconChain,
   IconChat,
   IconCommunity,
+  IconEllipsis,
   IconHouse,
+  IconPencil,
   IconTrophy,
   IconEdit,
   IconNextChat,
