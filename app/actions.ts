@@ -47,7 +47,7 @@ export async function removeChat({ id, path }: { id: string; path: string }) {
     }
   }
 
-  await supabase.from('chat').delete().eq('id', id)
+  await supabase.from('chats').delete().eq('id', id)
 
   revalidatePath('/chat')
   return revalidatePath(path)
