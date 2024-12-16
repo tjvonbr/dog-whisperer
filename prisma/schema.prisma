@@ -13,11 +13,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+ 
+ 
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Chat {
+  id           String     @id @default(uuid())
+  title        String
+  messages     Message[]     
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  path         String
+  sharePath    String? 
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("chats")
+}
+
+enum MessageRole {
+  ASSISTANT
+  SYSTEM
+  USER
+}
+
+model Message {
+  id           String        @id @default(uuid())
+  content      String
+  role         MessageRole
+  chatId       String
+  chat         Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Session {
+  sessionToken String     @unique
+  expires      DateTime
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("sessions")
+}
+
 model User {
-  id        String        @default(uuid())
-  firstName String
-  lastName  String
-  email     String        @unique()
+  id            String        @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String        @unique()
+  emailVerified DateTime?
+  accounts      Account[]
+  sessions      Session[]
+  chats         Chat[]
 
   @@map("users")
 }
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+

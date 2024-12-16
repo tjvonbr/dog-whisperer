@@ -4,7 +4,6 @@ import '@/app/globals.css'
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
-import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata = {
   metadataBase: process.env.VERCEL_URL
@@ -35,7 +34,6 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body
           className={cn(
@@ -59,6 +57,5 @@ export default function RootLayout({ children }: RootLayoutProps) {
           </Providers>
         </body>
       </html>
-    </ClerkProvider>
   )
 }

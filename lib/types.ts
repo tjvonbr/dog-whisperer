@@ -29,13 +29,10 @@ export interface AuthResult {
   message: string
 }
 
-export interface User extends Record<string, any> {
-  id: string
+export interface UserDto {
   firstName: string
   lastName: string
   email: string
-  credits: number
-  stripeId?: string
 }
 
 export interface Subscription extends Record<string, any> {
