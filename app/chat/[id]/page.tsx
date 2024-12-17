@@ -1,10 +1,9 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
 import { getChat, getMissingKeys, getUser } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
-import { getSubscription } from '@/supabase/functions/subscriptions'
+import { auth } from '@/app/auth'
 
 export interface ChatPageProps {
   params: {
@@ -15,40 +14,40 @@ export interface ChatPageProps {
 export async function generateMetadata({
   params
 }: ChatPageProps): Promise<Metadata> {
-  const { userId } = await auth()
+  const session = await auth()
 
-  if (!userId) {
+  if (!session) {
     return {}
   }
 
-  const chat = await getChat(params.id, userId)
+  const chat = await getChat(params.id, session.user?.id!)
   return {
     title: chat?.title.toString().slice(0, 50) ?? 'Chat'
   }
 }
 
 export default async function ChatPage({ params }: ChatPageProps) {
-  const { userId } = auth()
+  const session = auth()
 
   const missingKeys = await getMissingKeys()
 
-  if (!userId) {
+  if (!session) {
     redirect(`/sign-in?next=/chat/${params.id}`)
   }
 
-  const user = await getUser(userId)
+  const user = await getUser(session.user?.id!)
 
   if (!user) {
     redirect('/sign-up')
   }
 
-  const chat = await getChat(params.id, userId)
+  const chat = await getChat(params.id, user.id)
 
   if (!chat) {
     redirect('/chat')
   }
 
-  if (chat?.userId !== userId) {
+  if (chat?.userId !== user.id) {
     notFound()
   }
 

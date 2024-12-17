@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
-import { User, type Chat } from '@/lib/types'
-import supabase from '@/server/supabase'
+import prisma from '@/server/prisma'
+import { Chat, User } from '@prisma/client'
+import { UserDto } from '@/lib/types'
 
 export async function getChats(userId?: string | null) {
   if (!userId) {
@@ -12,50 +12,60 @@ export async function getChats(userId?: string | null) {
   }
 
   try {
-    const { data: chats } = await supabase
-      .from('chats')
-      .select()
-      .eq('userId', userId)
+    const chats = await prisma.chat.findMany({
+      where: {
+        userId
+      }
+    })
 
-    return chats as Chat[]
+    return chats
   } catch (error) {
     return []
   }
 }
 
 export async function getChat(id: string, userId: string) {
-  const { data: chat } = await supabase
-    .from('chats')
-    .select()
-    .eq('id', id)
-    .limit(1)
-    .single()
+  const chat = await prisma.chat.findFirst({
+    where: {
+      id
+    }
+  })
 
   if (!chat || (userId && chat.userId !== userId)) {
     return null
   }
 
-  return chat as Chat
+  return chat
 }
 
-export async function removeChat({ id, path }: { id: string; path: string }) {
-  const { userId } = auth()
-
+export async function removeChat({ id, path, userId }: { id: string; path: string, userId: string}) {
   if (!userId) {
     return {
       error: 'Unauthorized'
     }
   }
 
-  await supabase.from('chats').delete().eq('id', id)
+  const chat = await prisma.chat.findFirst({
+    where: {
+      id
+    }
+  })
+
+  if (!chat || (userId && chat.userId !== userId)) {
+    return null
+  }
+
+  await prisma.chat.delete({
+    where: {
+      id
+    }
+  })
 
   revalidatePath('/chat')
   return revalidatePath(path)
 }
 
-export async function clearChats() {
-  const { userId } = auth()
-
+export async function clearChats(userId: string) {
   if (!userId) {
     return {
       error: 'Unauthorized'
@@ -70,19 +80,24 @@ export async function clearChats() {
 
   const chatIds = chats.map(chat => chat.id)
 
-  await supabase.from('chats').delete().in('id', chatIds)
+  await prisma.chat.deleteMany({
+    where: {
+      id: {
+        in: chatIds
+      }
+    }
+  })
 
   revalidatePath('/chat')
   return redirect('/chat')
 }
 
 export async function getSharedChat(id: string) {
-  const { data: chat } = await supabase
-    .from('chats')
-    .select()
-    .eq('id', id)
-    .limit(1)
-    .single()
+  const chat = await prisma.chat.findFirst({
+    where: {
+      id
+    }
+  })
 
   if (!chat || !chat.sharePath) {
     return null
@@ -91,9 +106,7 @@ export async function getSharedChat(id: string) {
   return chat
 }
 
-export async function shareChat(id: string) {
-  const { userId } = auth()
-
+export async function shareChat(id: string, userId: string) {
   if (!userId) {
     return {
       error: 'Unauthorized'
@@ -113,78 +126,75 @@ export async function shareChat(id: string) {
     sharePath: `/share/${chat.id}`
   }
 
-  await supabase.from('chats').update({
-    sharePath: payload.sharePath
+  await prisma.chat.update({
+    where: {
+      id: chat.id
+    },
+    data: {
+      sharePath: payload.sharePath
+    }
   })
 
   return payload
 }
 
-export async function saveChat(chat: Chat) {
-  const { userId } = auth()
+// export async function saveChat(chat: Chat) {
+//   const { userId } = auth()
 
-  if (!userId) {
-    return {
-      error: 'You are not authorized to perform this action.'
+//   if (!userId) {
+//     return {
+//       error: 'You are not authorized to perform this action.'
+//     }
+//   }
+
+//   const result = await supabase
+//     .from('chats')
+//     .upsert({
+//       id: chat.id,
+//       title: chat.title,
+//       path: chat.path,
+//       messages: chat.messages,
+//       userId,
+//       updatedAt: new Date()
+//     })
+//     .select('id')
+
+//   return result
+// }
+
+export async function createUser(user: UserDto) {
+  const newUser = await prisma.user.create({
+    data: {
+      firstName: user.firstName,
+      lastName: user.email,
+      email: user.email
     }
-  }
-
-  const result = await supabase
-    .from('chats')
-    .upsert({
-      id: chat.id,
-      title: chat.title,
-      path: chat.path,
-      messages: chat.messages,
-      userId,
-      updatedAt: new Date()
-    })
-    .select('id')
-
-  return result
-}
-
-export async function saveUser(user: User) {
-  const { data: newUser } = await supabase.from('users').insert({
-    id: user.id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    stripeId: user.stripeId
   })
-    .select()
-  
+
   return newUser
 }
 
 export async function getUser(id: string) {
-  const { data: user } = await supabase
-    .from('users')
-    .select()
-    .eq('id', id)
-    .limit(1)
-    .single()
-
-  if (!user) {
-    return null
-  }
+  const user = await prisma.user.findFirst({
+    where: {
+      id
+    }
+  })
 
   return user
 }
 
 export async function updateUser(user: User) {
-  const { data: updatedUser } = await supabase
-    .from('users')
-    .update({
-    ...user
-    })
-    .eq('id', user.id)
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      ...user
+    }
+  })
 
-  if (!user) {
-    return null
-  }
-
-  return user
+  return updatedUser
 }
 
 export async function refreshHistory(path: string) {
