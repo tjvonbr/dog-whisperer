@@ -1,7 +1,6 @@
 import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import stripe from '@/server/stripe'
-import supabase from '@/server/supabase'
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string

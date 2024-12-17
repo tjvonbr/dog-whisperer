@@ -7,7 +7,7 @@ import Resend from "next-auth/providers/resend"
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   callbacks: {
-    jwt({ token, user}) {
+    jwt({ token, user }) {
       if (user) {
         token.id = user.id
       }

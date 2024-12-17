@@ -29,8 +29,6 @@ model Account {
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
- 
- 
   @@id([provider, providerAccountId])
   @@map("accounts")
 }
@@ -76,15 +74,40 @@ model Session {
   @@map("sessions")
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  CANCELED
+  UNPAID
+  PAUSED
+}
+
+model Subscription {
+  id            String      @id
+  status        SubscriptionStatus
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("subscriptions")
+}
+
 model User {
-  id            String        @id @default(uuid())
-  firstName     String
-  lastName      String
-  email         String        @unique()
-  emailVerified DateTime?
-  accounts      Account[]
-  sessions      Session[]
-  chats         Chat[]
+  id              String        @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String        @unique()
+  emailVerified   DateTime?
+  accounts        Account[]
+  sessions        Session[]
+  chats           Chat[]
+  stripeId        String?
+  subscriptionId  String?
+  subscription    Subscription?
 
   @@map("users")
 }

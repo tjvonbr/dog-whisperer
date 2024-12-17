@@ -31,7 +31,7 @@ async function UserOrLogin() {
           <IconNextChat className="hidden size-6 mr-2 dark:block" />
         </Link>
       )}
-      {session && <UserMenu />}
+      {user && <UserMenu user={user} />}
     </div>
   )
 }
