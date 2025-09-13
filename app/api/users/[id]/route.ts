@@ -1,6 +1,5 @@
 import { getUser, updateUser } from '@/app/actions';
-import { User } from '@/lib/types';
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/app/auth';
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -17,16 +16,16 @@ const updateUserSchema = z.object({
 type UpdateUserInput = z.infer<typeof updateUserSchema>;
 
 export async function PUT(req: NextRequest) {
-  const { userId } = auth()
+  const session = await auth()
 
-  if (!userId) {
-    return NextResponse.json("User is not authenticated.", { status: 401})
+  if (!session) {
+    return NextResponse.json("User is not authenticated.", { status: 401 })
   }
 
   const json = await req.json()
   const body = updateUserSchema.parse(json)
 
-  if (userId !== body.id) {
+  if (session.user && (session.user.id !== body.id)) {
     return NextResponse.json("User is not authorized to perform this action.", { status: 403})
   }
 

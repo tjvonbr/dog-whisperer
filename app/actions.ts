@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import prisma from '@/server/prisma'
-import { Chat, User } from '@prisma/client'
+import { Chat, Subscription, User } from '@prisma/client'
 import { UserDto } from '@/lib/types'
 
 export async function getChats(userId?: string | null) {
@@ -15,6 +15,9 @@ export async function getChats(userId?: string | null) {
     const chats = await prisma.chat.findMany({
       where: {
         userId
+      },
+      include: {
+        messages: true
       }
     })
 
@@ -28,6 +31,9 @@ export async function getChat(id: string, userId: string) {
   const chat = await prisma.chat.findFirst({
     where: {
       id
+    },
+    include: {
+      messages: true
     }
   })
 
@@ -199,6 +205,20 @@ export async function updateUser(user: User) {
 
 export async function refreshHistory(path: string) {
   redirect(path)
+}
+
+export async function getSubscription(userId: string): Promise<Subscription | null> {
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId
+    }
+  })
+
+  if (!subscription) {
+    return null
+  }
+
+  return subscription
 }
 
 export async function getMissingKeys() {

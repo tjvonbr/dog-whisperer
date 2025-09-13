@@ -3,8 +3,7 @@
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { toast } from 'sonner'
-
-import { ServerActionResult, type Chat } from '@/lib/types'
+import { ChatWithMessages, ServerActionResult } from '@/lib/types'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,9 +36,10 @@ import {
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
 import { RenameChatDialog } from './rename-chat-dialog'
+import { Chat } from '@prisma/client'
 
 interface SidebarActionsProps {
-  chat: Chat
+  chat: ChatWithMessages
   removeChat: (args: { id: string; path: string }) => ServerActionResult<void>
   shareChat: (id: string) => ServerActionResult<Chat>
 }

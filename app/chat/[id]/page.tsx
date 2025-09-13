@@ -27,7 +27,7 @@ export async function generateMetadata({
 }
 
 export default async function ChatPage({ params }: ChatPageProps) {
-  const session = auth()
+  const session = await auth()
 
   const missingKeys = await getMissingKeys()
 
@@ -35,7 +35,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
     redirect(`/sign-in?next=/chat/${params.id}`)
   }
 
-  const user = await getUser(session.user?.id!)
+  const user = await getUser(session?.user?.id!)
 
   if (!user) {
     redirect('/sign-up')
@@ -51,10 +51,10 @@ export default async function ChatPage({ params }: ChatPageProps) {
     notFound()
   }
 
-  const subscription = await getSubscription(userId)
+  const subscription = await getSubscription(user.id)
 
   return (
-    <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
+    <AI initialAIState={{ chatId: chat.id, messages: chat. }}>
       <Chat
         id={chat.id}
         user={user}

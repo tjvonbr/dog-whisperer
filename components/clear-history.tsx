@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-
 import { ServerActionResult } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,19 +17,21 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { IconSpinner } from '@/components/ui/icons'
+import { User } from '@prisma/client'
 
 interface ClearHistoryProps {
   isEnabled: boolean
-  clearChats: () => ServerActionResult<void>
+  clearChats: (userId: string) => ServerActionResult<void>
+  user: User
 }
 
 export function ClearHistory({
   isEnabled = false,
-  clearChats
+  clearChats,
+  user
 }: ClearHistoryProps) {
   const [open, setOpen] = React.useState(false)
   const [isPending, startTransition] = React.useTransition()
-  const router = useRouter()
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -55,7 +56,7 @@ export function ClearHistory({
             onClick={event => {
               event.preventDefault()
               startTransition(async () => {
-                const result = await clearChats()
+                const result = await clearChats(user.id)
                 if (result && 'error' in result) {
                   toast.error(result.error)
                   return

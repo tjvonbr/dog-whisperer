@@ -1,15 +1,14 @@
 import { cache } from 'react'
-import { clearChats, getChats } from '@/app/actions'
+import { clearChats, getChats, getSubscription } from '@/app/actions'
 import { ClearHistory } from '@/components/clear-history'
 import { SidebarItems } from '@/components/sidebar-items'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { User } from '@/lib/types'
-import { getSubscription } from '@/supabase/functions/subscriptions'
 import { CanceledAlert } from './canceled-alert'
+import { SubscriptionStatus, User } from '@prisma/client'
 
 interface SidebarListProps {
-  user: User
   children?: React.ReactNode
+  user: User
 }
 
 const loadChats = cache(async (userId?: string) => {
@@ -35,7 +34,7 @@ export async function SidebarList({ user }: SidebarListProps) {
       </div>
       <div className="w-full flex flex-col">
         <div className="flex flex-col items-center justify-between p-4">
-          {subscription && subscription.status === 'canceled' && (
+          {subscription && subscription.status === SubscriptionStatus.CANCELED && (
             <CanceledAlert user={user} />
           )}
           <div className="w-full flex justify-between items-center">
@@ -43,6 +42,7 @@ export async function SidebarList({ user }: SidebarListProps) {
             <ClearHistory
               clearChats={clearChats}
               isEnabled={chats?.length > 0}
+              user={user}
             />
           </div>
         </div>

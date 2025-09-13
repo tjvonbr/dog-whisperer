@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { shareChat } from '@/app/actions'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonProps, buttonVariants } from '@/components/ui/button'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
 import { IconSeparator, IconShare } from '@/components/ui/icons'
@@ -136,7 +136,7 @@ export function ChatPanel({
               {id && title ? (
                 <>
                   <Button
-                    variant="outline"
+                    variant={ title ? "outline" : "default" }
                     onClick={() => setShareDialogOpen(true)}
                   >
                     <IconShare className="mr-2" />
