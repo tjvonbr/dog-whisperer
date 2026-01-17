@@ -1,24 +1,24 @@
 import * as React from 'react'
 import Link from 'next/link'
-import { auth } from '@clerk/nextjs/server'
 import { IconLogo, IconNextChat } from '@/components/ui/icons'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
 import UserMenu from './user-menu'
 import { getUser } from '@/app/actions'
+import { auth } from '@/app/auth'
 
 async function UserOrLogin() {
-  const { userId } = auth()
+  const session = await auth()
 
   let user = null
-  if (userId) {
-    user = await getUser(userId)
+  if (session && session?.user?.id) {
+    user = await getUser(session.user.id)
   }
 
   return (
     <div className="w-full flex justify-between items-center">
-      {userId ? (
+      {session ? (
         <>
           <SidebarMobile>
             <ChatHistory user={user} />
@@ -31,7 +31,7 @@ async function UserOrLogin() {
           <IconNextChat className="hidden size-6 mr-2 dark:block" />
         </Link>
       )}
-      {userId && <UserMenu />}
+      {user && <UserMenu user={user} />}
     </div>
   )
 }

@@ -1,12 +1,9 @@
 'use client'
 
 import * as React from 'react'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
 import { motion } from 'framer-motion'
-
 import { buttonVariants } from '@/components/ui/button'
 import { IconMessage, IconUsers } from '@/components/ui/icons'
 import {
@@ -15,8 +12,8 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { type Chat } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { Chat } from '@prisma/client'
 
 interface SidebarItemProps {
   index: number

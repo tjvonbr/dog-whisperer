@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import { useClerk, useUser } from '@clerk/nextjs'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,15 +12,15 @@ import {
 } from './ui/dropdown-menu'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { User } from '@prisma/client'
+import { signOut } from 'next-auth/react'
 
-export default function UserMenu() {
+interface UserMenuProps {
+  user: User
+}
+
+export default function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
-  const { isLoaded, user } = useUser()
-  const { signOut, openUserProfile } = useClerk()
-
-  if (!isLoaded || !user?.id) {
-    return null
-  }
 
   async function createBillingSession() {
     const response = await fetch('/api/stripe/billing-session', {
@@ -40,8 +39,8 @@ export default function UserMenu() {
       <DropdownMenuTrigger className="flex items-center">
         <Image
           className="rounded-full mr-2"
-          alt={user?.primaryEmailAddress?.emailAddress!}
-          src={user?.imageUrl}
+          alt={user.email}
+          src={user.email}
           width={30}
           height={30}
         />
@@ -52,16 +51,17 @@ export default function UserMenu() {
             {user?.firstName} {user?.lastName}
           </p>
           <p className="text-xs font-light text-muted-foreground">
-            {user?.username
-              ? user.username
-              : user?.primaryEmailAddress?.emailAddress!}
+            {user.firstName
+              ? user.firstName
+              : user.email
+            }
           </p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
             className="text-sm"
-            onClick={() => openUserProfile()}
+            onClick={() => console.log('profile')}
           >
             Profile
           </DropdownMenuItem>
@@ -72,7 +72,7 @@ export default function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="hover:cursor-pointer"
-          onClick={() => signOut(() => router.push('/sign-in'))}
+          onClick={() => signOut}
         >
           Sign Out
         </DropdownMenuItem>

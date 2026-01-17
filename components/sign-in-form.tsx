@@ -12,17 +12,15 @@ import { IconSpinner } from './ui/icons'
 import { formSchema } from '@/lib/validations/auth'
 import { useRouter } from 'next/navigation'
 
-export default function UserForm() {
+export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false)
-
+  
   const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: ''
+      email: ""
     }
   })
 

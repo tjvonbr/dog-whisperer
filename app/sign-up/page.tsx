@@ -1,6 +1,4 @@
 import { IconLogo } from '@/components/ui/icons'
-import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
 import UserForm from '@/components/user-form'
 import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
@@ -12,22 +10,16 @@ export const metadata = {
 }
 
 export default async function SignupPage() {
-  const { userId } = auth()
-
-  if (userId) {
-    redirect('/chat')
-  }
-
   return (
     <div className="container grid h-screen w-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
       <Link
-        href="/login"
+        href="/sign-in"
         className={cn(
           buttonVariants({ variant: 'ghost' }),
           'absolute right-4 top-4 md:right-8 md:top-8'
         )}
       >
-        Login
+        Sign in
       </Link>
       <div className="hidden h-full bg-muted lg:block" />
       <div className="lg:p-8">

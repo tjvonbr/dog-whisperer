@@ -26,7 +26,7 @@ export function ChatList({ messages, userId, isShared }: ChatList) {
             <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
               <p className="text-muted-foreground leading-normal">
                 Please{' '}
-                <Link href="/login" className="underline">
+                <Link href="/sign-in" className="underline">
                   log in
                 </Link>{' '}
                 or{' '}

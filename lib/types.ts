@@ -1,13 +1,7 @@
-import { Message } from 'ai'
+import { Chat, Message } from '@prisma/client'
 
-export interface Chat extends Record<string, any> {
-  id: string
-  title: string
-  createdAt?: Date
-  userId: string
-  path: string
+export interface ChatWithMessages extends Chat {
   messages: Message[]
-  sharePath?: string
 }
 
 export type ServerActionResult<Result> = Promise<
@@ -29,13 +23,10 @@ export interface AuthResult {
   message: string
 }
 
-export interface User extends Record<string, any> {
-  id: string
+export interface UserDto {
   firstName: string
   lastName: string
   email: string
-  credits: number
-  stripeId?: string
 }
 
 export interface Subscription extends Record<string, any> {

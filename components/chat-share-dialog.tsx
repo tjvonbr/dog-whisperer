@@ -3,8 +3,7 @@
 import * as React from 'react'
 import { type DialogProps } from '@radix-ui/react-dialog'
 import { toast } from 'sonner'
-
-import { ServerActionResult, type Chat } from '@/lib/types'
+import { ChatWithMessages, ServerActionResult } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -16,9 +15,10 @@ import {
 } from '@/components/ui/dialog'
 import { IconSpinner } from '@/components/ui/icons'
 import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
+import { Chat } from '@prisma/client'
 
 interface ChatShareDialogProps extends DialogProps {
-  chat: Pick<Chat, 'id' | 'title' | 'messages'>
+  chat: ChatWithMessages
   shareChat: (id: string) => ServerActionResult<Chat>
   onCopy: () => void
 }
